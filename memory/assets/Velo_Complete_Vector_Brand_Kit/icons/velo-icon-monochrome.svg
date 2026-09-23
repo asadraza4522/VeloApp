@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+<defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-opacity=".18"/></filter></defs>
+
+<g filter="url(#s)" fill="none" stroke="#FFFFFF" stroke-width="112" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M282 235 L618 432"/>
+ <path d="M282 235 L430 650"/>
+ <path d="M430 650 L722 304"/>
+</g>
+<g fill="#FFFFFF"><rect x="739" y="612" width="76" height="184" rx="28"/><path d="M687 758 L777 850 L867 758 Z"/></g>
+</svg>

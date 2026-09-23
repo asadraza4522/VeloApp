@@ -1,0 +1,12 @@
+{
+  "platforms": [
+    "android"
+  ],
+  "android": {
+    "modules": [
+      "expo.modules.velodownloadengine.VeloDownloadEngineModule",
+      "expo.modules.velodownloadengine.VeloMediaStoreModule",
+      "expo.modules.velodownloadengine.VeloMediaToolsModule"
+    ]
+  }
+}

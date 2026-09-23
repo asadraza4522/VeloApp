@@ -1,0 +1,23 @@
+# Resolver worker on Fly.io: one small always-on machine (no cold start). Private: reachable only from
+# Supabase Edge Functions with the shared secret. Set secrets with `fly secrets set`, never here.
+app = "velo-worker"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/healthz"
+    interval = "30s"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

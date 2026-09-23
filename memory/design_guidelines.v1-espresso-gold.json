@@ -1,0 +1,171 @@
+{
+  "app_name": "Velo",
+  "personality": "6 Glass / Luxe DARK fused with 7 Dark-First Utility",
+  "personality_one_liner": "A deeply elegant, cinematic command center—like a high-end audio journal—that treats file downloading and media conversion with editorial reverence.",
+  "color": {
+    "surface": "#131110",
+    "onSurface": "#F2EFEA",
+    "surfaceSecondary": "#1B1917",
+    "onSurfaceSecondary": "#E1DCD3",
+    "surfaceTertiary": "#262321",
+    "onSurfaceTertiary": "#D0C8BD",
+    "surfaceInverse": "#F2EFEA",
+    "onSurfaceInverse": "#131110",
+    "brand": "#CFA360",
+    "brandPrimary": "#CFA360",
+    "onBrandPrimary": "#131110",
+    "brandSecondary": "#967A4F",
+    "onBrandSecondary": "#F2EFEA",
+    "brandTertiary": "#3D3120",
+    "onBrandTertiary": "#CFA360",
+    "success": "#4E7457",
+    "onSuccess": "#E0EFEB",
+    "warning": "#A87C42",
+    "onWarning": "#F9EEDB",
+    "error": "#964843",
+    "onError": "#F2DFDF",
+    "info": "#60747E",
+    "onInfo": "#E5F0F5",
+    "border": "#2D2925",
+    "borderStrong": "#453F3A",
+    "divider": "#24211E",
+    "muted": "#827C76",
+    "onBrand": "#131110"
+  },
+  "typography": {
+    "displayFontFamily": "Fraunces",
+    "textFontFamily": "Satoshi",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous, editorial spacing. Let components breathe like an art gallery. Use md (12) for inner elements and xl (24) for macro layout.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "MaterialCommunityIcons",
+  "glassmorphism": {
+    "enabled": "true",
+    "do's": [
+      "Use heavily blurred glass (expo-blur) over the abstract hero texture on the Home tab.",
+      "Apply glass to the bottom tab bar and sticky headers.",
+      "Use glass for the floating playback controls overlaying album/video art on the Player screen.",
+      "Always underlay glass with a minimum 75% surface color tint to ensure typography remains perfectly readable."
+    ],
+    "dont's": [
+      "Never apply glass to standard list items, form inputs, or dense queue metric cards.",
+      "Never use glass without an underlying tint layer."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Home",
+      "purpose": "A cinematic URL resolver that feels like entering a premium studio space.",
+      "states": {
+        "loading": "A glowing amber ring spinner centered on the dark canvas.",
+        "empty": "An elegant tinted illustration with 'Awaiting your first media link.'",
+        "error": "Soft error toast with a retry button inside a glassmorphic container."
+      },
+      "layout": "Top half is a hero section featuring a dark, textured cinematic background image. Overlaid is a glassmorphic card housing a sleek URL input field (pill-shaped, brand primary cursor/focus ring) and a Paste button. The bottom half transitions to a solid surface displaying 'Recent Sources' in a 2-column grid with subtle brandTertiary icons."
+    },
+    {
+      "name": "Queue",
+      "purpose": "A highly readable, tactical command center for active and completed downloads.",
+      "states": {
+        "loading": "Skeleton rows echoing the progress bars.",
+        "empty": "A minimalist dust-particle background texture fading into the dark surface, with 'Queue is silent.'",
+        "error": "A highlighted card showing failed downloads with a one-tap retry."
+      },
+      "layout": "Strict list layout. Each active download card uses surfaceSecondary with a thin 0.5pt border. Progress bars are extremely thin (2-3pt) using brandPrimary (Gold) on a surfaceTertiary track. Actions (Pause/Resume/Cancel) are housed in a muted right-aligned block. Speed and ETA metrics use a monospace or tightly tracked Satoshi."
+    },
+    {
+      "name": "Library",
+      "purpose": "A gallery showcasing saved media, focusing on rich album/video art.",
+      "states": {
+        "loading": "Shimmering dark grey grids.",
+        "empty": "An elegant empty state with 'Your vault is empty.' and a CTA to explore.",
+        "error": "A retry state."
+      },
+      "layout": "Sticky glass header with a search bar and segmented control (Grid / List). The main area is a 2-column grid. Every media thumbnail MUST have a top-to-bottom gradient scrim (transparent to 80% surfaceInverse) to guarantee contrast for the overlaid title (in Fraunces) and duration pill."
+    },
+    {
+      "name": "Player",
+      "purpose": "An edge-to-edge, immersive playback experience.",
+      "states": {
+        "loading": "Blurred artwork background with a central spinner.",
+        "empty": "N/A - Player only pushed with valid media.",
+        "error": "Fallback artwork with 'Unable to play media.'"
+      },
+      "layout": "Full-bleed artwork covering the entire screen. A heavy vertical gradient scrim (transparent at top, transitioning to 90% surface at bottom) overlays the image. The title sits in the bottom third using Fraunces (xl or 2xl). Playback controls (Play, Seek, Skip) sit inside a sleek, pill-shaped glassmorphic floating bar near the bottom safe area."
+    },
+    {
+      "name": "Tools (Audio Studio)",
+      "purpose": "An elegant conversion interface treating files like high-end audio gear.",
+      "states": {
+        "loading": "Center spinner.",
+        "empty": "Select a file to begin conversion.",
+        "error": "Conversion failed toast."
+      },
+      "layout": "List-based settings interface. Features tactile, pill-shaped segmented controls for Format (MP3/M4A/OPUS) and Bitrate. Uses brandTertiary backgrounds for active selections to feel like illuminated studio buttons."
+    }
+  ],
+  "images": {
+    "home_hero_bg": {
+      "url": "https://images.pexels.com/photos/9665193/pexels-photo-9665193.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "dark": "https://images.pexels.com/photos/9665193/pexels-photo-9665193.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Mystical floating dust particles creating a dark, cinematic textured background"
+    },
+    "empty_state_texture": {
+      "url": "https://images.unsplash.com/photo-1526289034009-0240ddb68ce3?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "dark": "https://images.unsplash.com/photo-1526289034009-0240ddb68ce3?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Abstract black and white architectural lines for subtle structural background"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the color palette. Absolutely ZERO blues, purples, navies, or cyan gradients are allowed. Use the provided Smoked Espresso (Dark Charcoal) and Antique Gold palette.",
+    "Implement the elegant Fraunces serif font for display headers and media titles. This provides the requested 'unique twist' to distinguish it from generic Dribbble utility apps.",
+    "Ensure all images and thumbnails implement the MANDATORY vertical gradient scrim (transparent to >= 70% dark tint) before placing text on them.",
+    "Apply glassmorphism (blur over tint) to the bottom tab bar, sticky headers, and the home screen URL resolver card over the hero background.",
+    "For the Queue screen, prioritize tactical utility: keep progress bars thin and elegant (2pt), and use monospace-style layout for speed/ETA metrics.",
+    "Make the media player edge-to-edge, hiding the standard system header and allowing the artwork and glass controls to take center stage."
+  ],
+  "haptics": {
+    "button_press": "light",
+    "url_paste": "medium",
+    "tab_switch": "light",
+    "download_start": "success",
+    "download_complete": "success",
+    "queue_pause_resume": "rigid",
+    "format_toggle": "selection"
+  }
+}

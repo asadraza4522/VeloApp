@@ -1,0 +1,336 @@
+{
+  "app_name": "Velo",
+  "version": "3.1",
+  "supersedes": "design_guidelines.v2-navy-glass.json (navy/glassmorphism, retired) and .v1-espresso-gold.json (retired earlier). v3.0 (same file, same day) is corrected here against real applied mockups — see design_reference.",
+  "personality": "Nivora Daylight — neo-utilitarian editorial, light-only, tactile paper-and-ink",
+  "personality_one_liner": "Warm cream paper, sharp black ink outlines, hard offset shadows, one high-voltage amber accent. Feels like a premium archival tool, not a glossy consumer app.",
+  "theme_mode": "light_only",
+  "theme_mode_note": "Daylight-forward by design. Dark mode is explicitly deferred, not designed. Settings > Appearance keeps only 'Light' active for now; hide or disable Dark/System until a dark companion palette is designed as its own pass.",
+  "source_of_truth": {
+    "prd": "memory/Velo PRD v1.1.md (section 42 UI/UX, 43 Navigation, 47 Themes)",
+    "brand": "memory/assets/Velo_Complete_Vector_Brand_Kit/brand/VELO_BRAND_SPEC.md and memory/assets/Velo_Brand_Kit_Sheet.png (logo/icon unchanged by this reskin)",
+    "design_reference": "Primary, authoritative source: 12 user-supplied Stitch-generated screen mockups (HTML + PNG, Tailwind + Material 3 tokens) under the 'Nivora' style, one per PRD screen. Token values, exact px, and component structure below are read directly off those mockups, not guessed from the earlier prose-only theme docs. Where the two earlier text-only design docs (a generic neo-brutalist spec and a 'Nivora Daylight' spec) differ from the mockups, the mockups win — they are what the user actually approved as 'how this applies to the screen'.",
+    "reference_screens_path": "The 12 mockups were supplied as stitch_premium_mobile_app_ui_design.zip (one folder per screen, each with code.html + screen.png). Re-extract from the chat upload if needed; they are not committed to the repo.",
+    "implementation": "frontend/src/design/theme.ts (same keys as color.light below; no color literals in components)"
+  },
+  "color": {
+    "light": {
+      "surface": "#FCF9F8",
+      "onSurface": "#1C1B1B",
+      "surfaceSecondary": "#F6F3F2",
+      "onSurfaceSecondary": "#1C1B1B",
+      "surfaceTertiary": "#FFFFFF",
+      "onSurfaceTertiary": "#1C1B1B",
+      "surfaceInset": "#FAF8F5",
+      "surfaceContainerHigh": "#EBE7E7",
+      "surfaceInverse": "#1C1B1B",
+      "onSurfaceInverse": "#FFFFFF",
+      "brand": "#FFC800",
+      "brandPrimary": "#FFC800",
+      "onBrandPrimary": "#1C1B1B",
+      "brandPrimaryHover": "#EBB700",
+      "brandSecondary": "#1C1B1B",
+      "onBrandSecondary": "#FFFFFF",
+      "brandTertiary": "#FFF7D6",
+      "onBrandTertiary": "#1C1B1B",
+      "onBrand": "#1C1B1B",
+      "mutedAmber": "#755B00",
+      "accent": "#FFC800",
+      "onAccent": "#1C1B1B",
+      "success": "#006D40",
+      "onSuccess": "#FFFFFF",
+      "successSurface": "#66E79F",
+      "successSurfaceLight": "#E6F8EE",
+      "successBorder": "#1C1B1B",
+      "warning": "#AE3200",
+      "onWarning": "#FFFFFF",
+      "warningSurface": "#FD5920",
+      "onWarningSurface": "#521300",
+      "warningBorder": "#1C1B1B",
+      "error": "#BA1A1A",
+      "onError": "#FFFFFF",
+      "errorSurface": "#FFDAD6",
+      "onErrorSurface": "#93000A",
+      "errorBorder": "#1C1B1B",
+      "info": "#1D4ED8",
+      "onInfo": "#FFFFFF",
+      "infoSurface": "#EFF6FF",
+      "infoBorder": "#1C1B1B",
+      "neutralChipSurface": "#F1F5F9",
+      "neutralChipBorder": "#1C1B1B",
+      "neutralChipText": "#0F172A",
+      "border": "#121212",
+      "borderStrong": "#121212",
+      "borderSubtle": "#D2C5AB",
+      "divider": "#121212",
+      "muted": "#81765F",
+      "mutedSecondary": "#4F4632",
+      "scrim": "rgba(17, 19, 24, 0.35)"
+    },
+    "notes": [
+      "Two near-blacks, both real in the mockups, not a typo: `border`/`divider` (#121212) is the pure structural ink used for every border and offset shadow; `onSurface`/text tokens (#1C1B1B) is the very slightly warmer M3 on-surface used for body text. Keep them distinct — components use `colors.border` for outlines/shadows and `colors.onSurface` for text, never the other way round.",
+      "`brandPrimary` (#FFC800, M3 'primary-container') is the CTA/active fill. `mutedAmber` (#755B00, M3 'primary') is a separate, muted amber used only for small accent-tinted labels/icons (e.g. a 'Clipboard Link' eyebrow, a resolver icon) — never as a button fill.",
+      "success/warning use the M3 tertiary (green) and secondary (rust-orange) pairs respectively, not a generic traffic-light green/amber — this matches every status chip in the mockups (DOWNLOADING = amber `primary-fixed`, PROCESSING = mint `tertiary-fixed`, RETRY/Attempt = orange `secondary-container`, hard failure = `error`/`errorSurface`).",
+      "Status *Border tokens are #1C1B1B (a thin ink outline on the chip), not a tinted border — the mockups never use a colored border on a status pill, only a colored fill."
+    ],
+    "gradients": {
+      "usage": "None. Flat fills only — the brand-gradient CTA from the retired navy theme is gone. Primary CTA is a flat brandPrimary (#FFC800) fill with a black border and hard offset shadow, never a gradient."
+    },
+    "logo_only": {
+      "note": "Exact logomark colors from the brand spec are unchanged by this reskin. Do not use as UI tokens.",
+      "darkNavy": "#081A3D",
+      "deepNavy": "#071442",
+      "cyan": "#39DDF5",
+      "blue": "#168AF4",
+      "purple": "#6A32FF",
+      "violet": "#C04DFF",
+      "teal": "#18D5C5",
+      "downloadGreen": "#42E9B4"
+    }
+  },
+  "status_colors": {
+    "downloading_active": "brandPrimary fill (amber), ink text — matches the mockups' 'DOWNLOADING' chip (M3 primary-fixed).",
+    "processing": "successSurface fill (mint), success text — matches the 'PROCESSING' chip and progress % text (M3 tertiary/tertiary-fixed).",
+    "downloaded": "success text on successSurfaceLight fill.",
+    "file_missing": "warningSurface fill, onWarningSurface text — same family as failed_retryable (a 'you need to act' family), distinguished by icon + label, not a separate hue.",
+    "failed_retryable": "warningSurface fill (orange), onWarningSurface text — matches the mockups' 'RETRY' / 'Attempt 2 of 4' badges (M3 secondary-container).",
+    "source_unavailable": "error text on errorSurface fill — matches 'AUTH_REQUIRED' etc. badges (M3 error-container) and the error circle badge (solid `error` fill, white '!').",
+    "note": "Maps to PRD section 36 (green / yellow / blue / red) but the mockups collapse it to 3 chip families (amber=active, mint=healthy/done, orange=needs-attention) plus a 4th solid-red for hard failure. Always pair color with an icon and label (accessibility). Status chips use a *Surface fill + a plain #1C1B1B ink border, never a raw opacity tint."
+  },
+  "typography": {
+    "displayFontFamily": "PlusJakartaSans",
+    "textFontFamily": "PlusJakartaSans",
+    "monoFontFamily": "JetBrainsMono",
+    "weights": {
+      "display": ["ExtraBold"],
+      "headline": ["Bold", "ExtraBold"],
+      "text": ["Medium", "SemiBold"],
+      "overline": ["ExtraBold"]
+    },
+    "scale": {
+      "display": 30,
+      "h1": 24,
+      "h2": 20,
+      "h3": 16,
+      "bodyLg": 16,
+      "body": 14,
+      "caption": 12,
+      "overline": 11,
+      "mono": 12
+    },
+    "lineHeight": { "display": 1.15, "h1": 1.25, "h2": 1.4, "h3": 1.5, "body": 1.45, "caption": 1.5, "overline": 1.27 },
+    "letterSpacing": { "display": -0.02, "h1": -0.015, "h2": -0.015, "overline": 0.05 },
+    "rules": [
+      "Single-family typographic system: Plus Jakarta Sans for everything (display, headings, body, labels) — confirmed as the only font loaded across all 12 mockups.",
+      "JetBrains Mono (fallback ui-monospace/SFMono-Regular) for hash strings, file paths (/Velo/YouTube/...), timestamps, bitrates and resolution specs, and anywhere digits update live (speed/ETA/size) so they do not jitter. The mockups themselves don't use a mono font (they're Material-3-generated, not literally Nivora-specific on this point) — keep JetBrains Mono per the prose design docs since it is strictly better for jitter-free live digits and Velo already ships tabular-number handling.",
+      "Overline/label-sm (section anchors, category headers, eyebrow text) is ExtraBold 11px, uppercase, +0.05em tracking — exact mockup value (not +0.08em as earlier drafted).",
+      "Fonts installed and loaded: @expo-google-fonts/plus-jakarta-sans (500/600/700/800) + @expo-google-fonts/jetbrains-mono (500/600), wired in src/app/_layout.tsx's useFonts(). Poppins and Inter packages are removed."
+    ]
+  },
+  "spacing": {
+    "rule": "4px-based modular scale. Use sm-md (8-12) inside dense telemetry cards, md-lg (12-16) between macro sections — matches the mockups' `gutter`/`margin` (16px) and `space-md` (16px)/`space-sm` (8px) tokens.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 20,
+    "2xl": 24,
+    "3xl": 32
+  },
+  "radius_tokens": {
+    "note": "Corrected against the mockups' actual Tailwind config (borderRadius DEFAULT 4px, lg 8px, xl 12px, full 9999px) — earlier draft's 14/20/28 scale was invented, not sourced.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "pill": 999
+  },
+  "elevation": {
+    "shadow_tier": "tactile-offset",
+    "note": "No blurred drop-shadows on cards/rows/buttons/sheets. Depth = a 1.5px-2px solid ink (`colors.border`, #121212) border plus a hard, non-blurred offset shadow. Confirmed exact values from the mockups: resting card `2px 2px 0 #121212`; small chips/icon-badges `1px 1px 0` or `1.5px 1.5px 0`; primary CTA / emphasized input `2.5px 2.5px 0` to `3px 3px 0`; raised sheets/dialogs `4px 4px 0` over the `scrim`. Press/active state: the element translates by exactly the resting shadow's offset (so a 2px-shadow element translates (2,2), a 1.5px one translates (1.5,1.5)) and the shadow collapses to none — this is the theme's one universal interaction rule.",
+    "chrome_exception": "The fixed top header and the bottom tab bar are the ONE place this theme uses translucency: `background: surface at 90% opacity + backdrop-blur` (confirmed in all 12 mockups: `bg-surface/90 backdrop-blur-xl`), with a very soft `shadow-[0_1px_8px_rgba(0,0,0,0.04)]` (header) / `shadow-[0_-2px_10px_rgba(0,0,0,0.04)]` (tab bar) — a normal soft shadow, not the tactile-offset style, and no ink border on that edge. This overrides the 'no blur anywhere' instruction in the earlier prose-only v3.0 draft; everything else (cards, rows, sheets, chips, buttons) stays fully opaque with the tactile-offset style, zero blur.",
+    "replaces": "glassmorphism (v2) — GlassCard as a full-surface effect is gone. expo-blur is now used only for the header/tab-bar chrome per chrome_exception, not on content cards."
+  },
+  "navigation": {
+    "type": "bottom_tabs",
+    "tabs": ["Home", "Library", "Downloads", "Tools", "Settings"],
+    "note": "The mockups' own nav uses a different, generic 5-tab IA (Acquire / Resolve / Source / Library / Queue) invented by the design tool for a template product — it doesn't match Velo's actual routes (no Tools/Settings tab, 'Resolve' and 'Source' aren't tabs in our app). Keep our real IA and routes; borrow only the mockups' VISUAL tab-bar treatment below.",
+    "style": "Translucent bg-surface/90 + blur tab bar (see elevation.chrome_exception), 64px tall, no ink border. Each tab is a `flex-1` pill (rounded-full). Active tab: filled brandPrimary pill (`neo-shadow-active` = 1.5px 1.5px 0 ink) behind icon+label, bold text. Inactive tabs: mutedSecondary icon + label, no fill, no shadow."
+  },
+  "icon_set": {
+    "shipped": "MaterialCommunityIcons (@expo/vector-icons) — unchanged from earlier phases; do not add a new icon font for this reskin.",
+    "mockups_use": "Google 'Material Symbols Outlined' (a variable font not available in @expo/vector-icons). This is a real gap between the mockups and what the app can render today.",
+    "instruction": "When implementing a screen, map each Material-Symbols icon name in the mockup to the closest MaterialCommunityIcons name (e.g. `content_paste_go` -> `content-paste`, `history_edu` -> `history`, `radar` -> `radar` (exists), `offline_bolt` -> `lightning-bolt`, `hourglass_top` -> `timer-sand`, `hub` -> `source-branch` or `lan`, `terminal` -> `console`, `tune` -> `tune` (exists), `verified` -> `check-decagram`). Do not block a screen on an exact icon match; pick the nearest MaterialCommunityIcons glyph and move on. Only revisit adding Material Symbols as a bundled variable font if icon mismatches become a real design complaint after the reskin ships."
+  },
+  "glassmorphism": {
+    "enabled": "chrome_only",
+    "note": "See elevation.chrome_exception. Blur is allowed ONLY on the fixed header and bottom tab bar (translucent surface + backdrop-blur, confirmed in every mockup). It is NOT allowed anywhere else — no GlassCard, no blurred content cards, no blurred sheets/toasts. This corrects v3.0's blanket 'no glass' rule, which the mockups themselves don't follow."
+  },
+  "platform_libraries": {
+    "image": "expo-image",
+    "list": "@shopify/flash-list",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler",
+    "blur": "expo-blur — header + bottom tab bar chrome only, per glassmorphism.enabled",
+    "native_controls": "@expo/ui (BottomSheet, Picker, Slider, Switch, Menu) — restyle to flat/ink borders where @expo/ui allows custom colors; fall back to a custom tactile control only where it does not.",
+    "haptics": "expo-haptics"
+  },
+  "components": {
+    "Header": "Fixed, translucent (see chrome_exception), 64px tall (`h-16`), safe-area top padding. Left: logo mark + wordmark (+ optional 'PRO' pill badge when Premium active). Right: contextual icon buttons (search/profile), each a 44x44 hit target.",
+    "TabBar": "See navigation.style.",
+    "Card": "surfaceTertiary (#FFFFFF) fill (or surfaceInset #FAF8F5 for a quieter/inset card), 1.5px solid border(#121212), radius sm (8), tactile-offset shadow 2px 2px 0 #121212. Internal sections separated by a 1.5px solid border divider rule, not a soft line.",
+    "PrimaryButton": "brandPrimary (#FFC800) fill, onBrandPrimary (#1C1B1B) text, 1.5-2px solid border, radius sm-md (8-12), shadow 2-3px offset. Press: translate by the shadow offset, shadow to none. Full-width for main CTAs (e.g. 'DOWNLOAD (1.42 GB)'), compact/icon-only (h-8/h-10 square) for inline actions.",
+    "SecondaryButton": "surfaceInset (#FAF8F5) or white fill, onSurface text, 1.5px solid border, radius sm-md, shadow 1-2px offset. Press: translate by the shadow offset.",
+    "DestructiveButton": "errorSurface (#FFDAD6) fill, onErrorSurface (#93000A) text, 1px solid border, radius sm-md, no offset shadow (quieter than primary/secondary so it never reads as the default action).",
+    "GhostButton": "Transparent, no border, no shadow at rest. Hover/active reveals surfaceSecondary fill + 1.5px solid border.",
+    "UrlInputBar": "Outer surfaceTertiary card, 1.5px solid border, radius sm, shadow 2.5px 2.5px 0 (slightly heavier than a normal card since it's the primary action surface). Inner input well: surfaceInset (#FAF8F5) fill, 1.5px solid border, radius sm, small inset top-left shadow. Focus: border stays solid ink, brandPrimary/mutedAmber icon accent. Trailing Analyze button is a compact PrimaryButton.",
+    "MediaTile": "expo-image thumbnail, 1.5px solid ink border, radius sm, mandatory top-to-bottom scrim (transparent to onSurfaceInverse@70%) before overlaid text, title (Plus Jakarta Sans Bold), duration pill (bottom-right, dark pill/white text, mono digits), format/quality pill (top-left, brandTertiary or status-colored, ink border).",
+    "SourceRow": "surfaceTertiary row card, 1.5px solid border, thumb, title, creator - platform (caption, mutedSecondary), StatusChip, overflow menu (Download, Redownload, Open Source, Copy URL, Share). Mockup pattern: thumb+details on top, a `border-t-[1.5px]` divider, then an action strip (platform dot+label left, Inspect/quick-action buttons right).",
+    "DownloadRow": "surfaceTertiary card, 1.5px solid border, radius sm, shadow 2px 2px 0, striped progress track (`h-3 rounded-full border-1.5px ink`, filled portion is brandPrimary or successSurface depending on state, square/pill ends per the track's own radius not the fill), right-aligned Pause/Resume/Cancel as a small square tactile button, tabular mono speed/ETA/size below the bar. Failure rows sit inside an `errorSurface/30%`-tinted card and carry an Attempt counter chip.",
+    "StatusChip": "Pill (radius 999) or small rect (radius xs), plain 1px #1C1B1B ink border, icon + label, semantic *Surface token fill per status_colors — never a flat opacity tint.",
+    "PillTag": "Small pill/rect, 1px solid ink, label-sm ExtraBold uppercase +0.05em tracking. Technical spec pills (resolution/codec/fps) use a solid ink fill with white text; category/status pills use the semantic *Surface fill + ink border pair.",
+    "FormatRow": "Resolution, label (4K/QHD/Full HD/HD), codec/container (mono), estimated size + speed (mono, right-aligned bold); selected row gets a 2px solid ink border (up from 1.5px) and brandTertiary (#FFF7D6) fill — no glow, no gradient.",
+    "QualityPresetControl": "Segmented control, 1.5px solid ink border around the group, 1px dividers between segments; active segment = brandPrimary fill.",
+    "WaveformTrimmer": "Card (radius sm, shadow 2px 2px 0). Header row: 'Timeline Extraction' overline + 'Selected: 02:31.00' headline left, Loop toggle + Play button (square, brandPrimary fill) right. Below: a `h-24` surfaceContainerHigh well (radius sm, small inset shadow) holding two layers of thin rounded vertical bars — an inactive layer at ~40% opacity in mutedSecondary, and an active-selection layer (brandTertiary@30% background band) with full-opacity onSurface bars inside the selected in/out range. Used by Tools > Trim and Tools > Extract Audio.",
+    "PremiumTimer": "Mono numerals, brandPrimary accent when active, 'Watch Ad +1 Hour' as a SecondaryButton.",
+    "EmptyState": "Ink-line logomark illustration + one line of copy (body) + one PrimaryButton or GhostButton CTA.",
+    "Toast": "surfaceTertiary card, 1.5px solid border, shadow 4px 4px 0 (raised tier), error variant carries a Retry SecondaryButton. No blur (toasts are content, not chrome).",
+    "Switch": "Track 38x22, 1.5px solid ink outline. Off: surfaceSecondary track, white knob with ink outline. On: brandPrimary (or successSurface for a 'safe/verified' toggle) track, ink knob outline, tactile offset shadow on the knob only.",
+    "Checkbox": "18x18 square, radius xs (4), 1.5px solid ink, white fill, shadow 1.5px 1.5px 0. Checked: brandPrimary fill + ink checkmark.",
+    "Radio": "18x18 circle, 1.5px solid ink. Checked: solid ink inner dot on a brandPrimary ring."
+  },
+  "screens": [
+    {
+      "name": "Home",
+      "route": "(tabs)/index",
+      "mockup": "velo_home_acquire_nivora_style",
+      "purpose": "One link to Detect to Resolve to Choose. Fast, obvious primary action.",
+      "states": {
+        "loading": "Ink-outlined spinner (no gradient ring) inside the URL card while analyzing.",
+        "empty": "Ink-line logomark illustration with 'Paste a link to get started.'",
+        "error": "Toast (raised tactile card) with failure reason and the actions allowed for that failure code."
+      },
+      "layout": "Translucent Header. Flat surface content (no hero glow/gradient): status pill row ('Ready For Ingest' + 'Pipe: Online'), H1 tagline. Clipboard-detected banner card (brandTertiary fill) if a link is on the clipboard. UrlInputBar. 3-up preset shortcut grid (Audio Ingest / Link Only / Batch List, each a tinted Card). Active-download mini widget (striped progress + ETA) when something is running. Supported-platforms horizontal pill ribbon + one engine-status Card. Recent Source Captures: list of SourceRow-style capture cards with an action strip."
+    },
+    {
+      "name": "Library",
+      "route": "(tabs)/library",
+      "mockup": "velo_library_saved_sources_nivora_style",
+      "purpose": "Everything saved: downloaded media and persistent sources.",
+      "states": {
+        "loading": "surfaceSecondary skeleton grid (flat fill, no shimmer gradient — a simple opacity pulse is fine).",
+        "empty": "'Your library is empty.' + CTA to Home.",
+        "error": "Retry state."
+      },
+      "layout": "Translucent Header (search + filter + Grid/List toggle). Segmented [Media] [Sources]. Media = MediaTile grid (All / Videos / Images / Audio / Files pill chips). Sources = SourceRow list with StatusChip and 'File missing' badge. Translucent TabBar with Library active (filled pill)."
+    },
+    {
+      "name": "Downloads",
+      "route": "(tabs)/downloads",
+      "mockup": "velo_download_queue_engine_nivora_style",
+      "purpose": "Tactical queue: active, waiting, failed, completed.",
+      "states": {
+        "loading": "Skeleton rows echoing progress bars.",
+        "empty": "'Queue is silent.'",
+        "error": "Failed cards pinned first with failure-specific actions (Retry, Open Source, Choose another format)."
+      },
+      "layout": "Translucent Header with a search icon button and a running-count chip ('2 Running'). Strict list of DownloadRow, each its own bordered/shadowed Card. A DOWNLOADING row shows the amber status chip + striped progress; a PROCESSING row (post-download remux/extract) shows the mint chip + tertiary progress; a failed row sits in an errorSurface@40%-tinted card with a RETRY/Attempt chip and a bold error badge with the failure code (e.g. AUTH_REQUIRED). Section headers Active / Waiting / Failed / Completed as overline labels."
+    },
+    {
+      "name": "Source Details",
+      "route": "source/[id]",
+      "mockup": "velo_persistent_source_details_nivora_style",
+      "purpose": "The persistent source: metadata, actions, per-variant download history.",
+      "states": {
+        "loading": "Skeleton hero + rows.",
+        "empty": "N/A",
+        "error": "Source unavailable banner (errorSurface Card) with Open Source / Copy URL."
+      },
+      "layout": "Hero thumbnail with scrim, ink-bordered frame, title, creator, platform, dates. Primary Download (PrimaryButton) + Open Source/Copy URL/Share as SecondaryButtons in a row. Download History list (variant, status, date; 'File Missing' rows show a Redownload SecondaryButton)."
+    },
+    {
+      "name": "Format Picker",
+      "route": "sheets/format-picker",
+      "mockup": "velo_resolve_choose_format_nivora_style",
+      "purpose": "Choose quality/format; remembers the previous choice.",
+      "states": { "loading": "Skeleton rows", "empty": "No formats: show reason + Open Source", "error": "Resolver failure with Try Another Resolver" },
+      "layout": "Raised sheet (shadow 4px 4px 0, scrim behind): QualityPresetControl, previous-selection banner ('1080p MP4 available' / '1080p unavailable, 720p available') as an infoSurface Card, FormatRow list, Video/Audio toggle, PrimaryButton Download."
+    },
+    {
+      "name": "Tools",
+      "route": "(tabs)/tools",
+      "mockup": "velo_audio_extraction_conversion_studio (Extract Audio / Trim) + velo_organization_rules_storage_manager (Reorganize/Storage) + velo_duplicate_review_storage_purge (Duplicates)",
+      "purpose": "Media tools (extract audio, trim, image convert/resize/compress, frame grab, reorganize, duplicates, storage) and format/bitrate presets.",
+      "states": { "loading": "Center ink-outline spinner", "empty": "Select a file to begin.", "error": "Conversion failed Toast with Retry." },
+      "layout": "List of tool Cards (Media section, Library section). Pill segmented controls for Format/Bitrate where relevant; active option uses brandPrimary fill. Trim/Extract Audio use the WaveformTrimmer component. Duplicates uses side-by-side comparison cards with a size/hash readout and a Purge Candidate DestructiveButton. Reorganize/Storage use a token-syntax path builder Card + a folder-tree preview."
+    },
+    {
+      "name": "Player",
+      "route": "player/[id]",
+      "mockup": "velo_in_app_player_media_inspector",
+      "purpose": "Immersive playback.",
+      "states": { "loading": "Blurred artwork (this is content blur, not UI glassmorphism — still fine) + ink-outline spinner", "empty": "N/A", "error": "Fallback artwork with 'Unable to play media.'" },
+      "layout": "Edge-to-edge artwork/video, heavy bottom scrim, title (Plus Jakarta Sans Bold) in the bottom third, floating pill control bar in the bottom safe area — opaque ink/white bar with tactile shadow, not glass. System header hidden."
+    },
+    {
+      "name": "Settings",
+      "route": "(tabs)/settings",
+      "mockup": "velo_settings_themes_boost_hub",
+      "purpose": "Appearance, downloads, organization, premium, sync, about.",
+      "states": { "loading": "N/A", "empty": "N/A", "error": "Inline row errors" },
+      "layout": "Grouped sections as Cards (use @expo/ui where it allows tactile restyling): Appearance (Light only for now — Dark/System entries hidden or disabled per theme_mode_note), Downloads (Wi-Fi only, concurrency, default quality), Organization (folder + filename templates), Premium (timer, watch ad boost), Sync & account, About."
+    }
+  ],
+  "screens_out_of_scope_for_now": [
+    "3 mockups map to features not in Velo's current PRD/roadmap and should NOT be built from: velo_resolver_manager_engine_health (a multi-resolver priority/cookie-vault admin screen — Velo's worker resolver selection is automatic, no user-facing manager), velo_batch_ingestion_channel_bulk (bulk/channel batch downloads — a later Premium feature, not scheduled), velo_auth_sandbox_cookie_vault (an embedded cookie-sniffing webview for member-gated content — conflicts with the 'never bypass auth/DRM' rule in CLAUDE.md; do not build). Keep them only as visual style reference (color/shadow/radius), not as screens to implement."
+  ],
+  "motion": {
+    "principles": [
+      "Animate transform and opacity only.",
+      "Press/active feedback is a snap, not a spring: translate by the element's own resting-shadow offset and collapse the shadow to none in ~80-100ms, linear/ease-out — this IS the primary tactile feedback of the whole theme, must feel instant.",
+      "Hover/focus (where it applies, e.g. external keyboard/mouse) translates -1,-1 and expands the shadow by +1px.",
+      "Sheets/toasts use a short rise (translateY + opacity), not a blur fade.",
+      "Respect Reduce Motion: replace movement with an instant state swap."
+    ],
+    "durations_ms": { "press": 90, "fade": 150, "sheet": 240, "screen": 280 },
+    "progress_bar": "Animated on the UI thread from a shared value fed by throttled (max 4 Hz) native progress events. Track: `h-3 rounded-full` with a 1.5px ink border and small inner padding; fill is inset within that border, flat brandPrimary (active) or successSurface (processing), rounded-full ends matching the track (the mockups round the track, not the earlier draft's 'square ends' claim — corrected)."
+  },
+  "accessibility": {
+    "contrast": "Body text at least 4.5:1 on its surface. Ink-on-cream and ink-on-amber both pass comfortably; onBrandPrimary is always #1C1B1B (never white) because #FFC800 is too light for white text.",
+    "touch_targets": "At least 44x44 dp — confirmed in the mockups (`min-w-[44px] min-h-[44px]` on icon buttons). The compact 18x18 checkbox/radio glyphs still need a 44x44 hit slop.",
+    "status": "Never rely on color alone: icon + label, reinforced by the ink border so status is legible even at low vision / grayscale.",
+    "dynamic_type": "Layouts must survive 130% font scale — tactile cards have fixed-looking borders/shadows but must not clip text; let card height grow."
+  },
+  "images": {
+    "app_icon": "memory/assets/Velo_Icon_Exports/velo-icon-1024x1024.png",
+    "logo_dark": "memory/assets/Velo_Complete_Vector_Brand_Kit/logos/velo-logo-dark.svg",
+    "logo_light": "memory/assets/Velo_Complete_Vector_Brand_Kit/logos/velo-logo-light.svg",
+    "logo_mark": "memory/assets/Velo_Complete_Vector_Brand_Kit/icons/velo-icon-transparent.svg",
+    "android_adaptive": "memory/assets/Velo_Complete_Vector_Brand_Kit/android/ (background / foreground XML) — unchanged by this reskin, per the user's request to keep icons the same",
+    "splash": "Cream surface (#FCF9F8) with centered logomark + wordmark + tagline 'Save. Convert. Organize.', ink-outline treatment instead of the old navy/gradient glow.",
+    "hero_glow": "Removed. No radial gradient glow anywhere in Nivora Daylight — flat surface only."
+  },
+  "instructions_to_main_agent": [
+    "Use only tokens from color.light via useTheme(). Zero color literals in components. There is no color.dark in this version — see theme_mode_note.",
+    "The retired navy/glassmorphism (v2) and espresso/gold (v1) palettes must not appear anywhere.",
+    "Plus Jakarta Sans for everything (display through body/labels); JetBrains Mono for hashes/paths/timestamps/live numeric metrics.",
+    "Blur/translucency is allowed ONLY on the fixed Header and bottom TabBar (see elevation.chrome_exception). Everywhere else: zero blur, zero glass, zero gradients — depth is a solid ink border + hard offset shadow only.",
+    "Every thumbnail still gets the mandatory vertical scrim before overlaying text.",
+    "Sheets, pickers, toggles and sliders: try @expo/ui first, restyle its colors to the ink/amber tokens; only build a custom tactile control where @expo/ui cannot take custom colors/borders.",
+    "Every status uses icon + label + color per status_colors (a *Surface fill + a plain ink border), never a raw opacity tint.",
+    "Press states must show the translate-by-shadow-offset + shadow-collapse tactile feedback on every bordered/shadowed interactive element (buttons, cards that are pressable, chips).",
+    "Map each mockup's Material-Symbols icon name to the nearest MaterialCommunityIcons glyph per icon_set.instruction — do not add a new icon font.",
+    "Do NOT build the 3 screens listed in screens_out_of_scope_for_now.",
+    "This file only changes the visual skin (color/type/shape/elevation/motion). Do not change the 5-tab navigation IA or screen routes as part of applying it — the mockups' own nav labels are a generic template artifact, ignore them (see navigation.note).",
+    "Apply screen-by-screen once this file and theme.ts are approved; do not big-bang every screen in one pass. Cross-check each screen against its `mockup` field's screen.png/code.html for exact spacing/copy before marking it done."
+  ],
+  "haptics": {
+    "button_press": "light",
+    "url_paste": "medium",
+    "tab_switch": "light",
+    "download_start": "success",
+    "download_complete": "success",
+    "download_failed": "error",
+    "queue_pause_resume": "rigid",
+    "format_toggle": "selection"
+  }
+}

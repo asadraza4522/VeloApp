@@ -1,0 +1,30 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.velodownloadengine'
+version = '0.1.0'
+
+android {
+  namespace "expo.modules.velodownloadengine"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+  testOptions {
+    unitTests.returnDefaultValues = true
+  }
+}
+
+dependencies {
+  implementation "androidx.work:work-runtime-ktx:2.10.0"
+  implementation "com.squareup.okhttp3:okhttp:4.12.0"
+
+  testImplementation "junit:junit:4.13.2"
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"
+  testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
+}

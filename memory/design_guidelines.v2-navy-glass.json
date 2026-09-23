@@ -1,0 +1,298 @@
+{
+  "app_name": "Velo",
+  "version": "2.0",
+  "supersedes": "design_guidelines.v1-espresso-gold.json (espresso/gold, retired in favour of the brand kit)",
+  "personality": "Modern iOS-inspired glassmorphism on a deep-navy base, dark-first, driven by the Velo brand kit",
+  "personality_one_liner": "A calm, luminous command center for saving media: deep navy, glass surfaces, a cyan-to-purple brand gradient, and a teal download accent.",
+  "source_of_truth": {
+    "prd": "memory/Velo PRD v1.1.md (section 42 UI/UX, 43 Navigation, 47 Themes)",
+    "brand": "memory/assets/Velo_Complete_Vector_Brand_Kit/brand/VELO_BRAND_SPEC.md and memory/assets/Velo_Brand_Kit_Sheet.png",
+    "implementation": "frontend/src/design/theme.ts (same keys as color.dark / color.light below; no color literals in components)"
+  },
+  "color": {
+    "dark": {
+      "surface": "#0A1020",
+      "onSurface": "#F3F6FF",
+      "surfaceSecondary": "#111B33",
+      "onSurfaceSecondary": "#D5DCF0",
+      "surfaceTertiary": "#182647",
+      "onSurfaceTertiary": "#B7C2E0",
+      "surfaceInverse": "#F3F6FF",
+      "onSurfaceInverse": "#0A1020",
+      "brand": "#2563EB",
+      "brandPrimary": "#2563EB",
+      "onBrandPrimary": "#FFFFFF",
+      "brandSecondary": "#8B5CF6",
+      "onBrandSecondary": "#FFFFFF",
+      "brandTertiary": "#14275A",
+      "onBrandTertiary": "#93B4FF",
+      "onBrand": "#FFFFFF",
+      "accent": "#10B981",
+      "onAccent": "#03140F",
+      "success": "#10B981",
+      "onSuccess": "#03140F",
+      "warning": "#F59E0B",
+      "onWarning": "#2A1A00",
+      "error": "#EF4444",
+      "onError": "#FFFFFF",
+      "info": "#38BDF8",
+      "onInfo": "#00202E",
+      "border": "#1E2B4D",
+      "borderStrong": "#33447A",
+      "divider": "#16213D",
+      "muted": "#8B97B8",
+      "scrim": "#050914"
+    },
+    "light": {
+      "surface": "#F3F6FF",
+      "onSurface": "#0A1020",
+      "surfaceSecondary": "#FFFFFF",
+      "onSurfaceSecondary": "#24304F",
+      "surfaceTertiary": "#E6ECFB",
+      "onSurfaceTertiary": "#3B4A75",
+      "surfaceInverse": "#0A1020",
+      "onSurfaceInverse": "#F3F6FF",
+      "brand": "#2563EB",
+      "brandPrimary": "#2563EB",
+      "onBrandPrimary": "#FFFFFF",
+      "brandSecondary": "#8B5CF6",
+      "onBrandSecondary": "#FFFFFF",
+      "brandTertiary": "#DCE6FF",
+      "onBrandTertiary": "#1E40AF",
+      "onBrand": "#FFFFFF",
+      "accent": "#10B981",
+      "onAccent": "#03140F",
+      "success": "#059669",
+      "onSuccess": "#FFFFFF",
+      "warning": "#B45309",
+      "onWarning": "#FFFFFF",
+      "error": "#DC2626",
+      "onError": "#FFFFFF",
+      "info": "#0284C7",
+      "onInfo": "#FFFFFF",
+      "border": "#D9E1F5",
+      "borderStrong": "#B4C2E8",
+      "divider": "#E3E9F8",
+      "muted": "#65708F",
+      "scrim": "#0A1020"
+    },
+    "gradients": {
+      "brand": ["#39DDF5", "#168AF4", "#6A32FF"],
+      "brandAngle": 135,
+      "download": ["#18D5C5", "#42E9B4"],
+      "usage": "Brand gradient only for the primary CTA, the logomark, progress fill and premium timer. Never as a full-screen background except the splash/hero, where it is a soft radial glow over surface."
+    },
+    "logo_only": {
+      "note": "Exact logomark colors from the brand spec. Do not use as UI tokens.",
+      "darkNavy": "#081A3D",
+      "deepNavy": "#071442",
+      "cyan": "#39DDF5",
+      "blue": "#168AF4",
+      "purple": "#6A32FF",
+      "violet": "#C04DFF",
+      "teal": "#18D5C5",
+      "downloadGreen": "#42E9B4"
+    }
+  },
+  "status_colors": {
+    "downloaded": "success",
+    "file_missing": "warning",
+    "failed_retryable": "info",
+    "source_unavailable": "error",
+    "note": "Maps to PRD section 36 (green / yellow / blue / red). Always pair color with an icon and label (accessibility)."
+  },
+  "typography": {
+    "displayFontFamily": "Poppins",
+    "textFontFamily": "Inter",
+    "monoFontFamily": "SpaceMono",
+    "weights": {
+      "display": ["SemiBold", "Bold"],
+      "text": ["Regular", "Medium", "SemiBold"],
+      "tagline": ["Medium"]
+    },
+    "scale": { "xs": 11, "sm": 12, "base": 14, "lg": 16, "xl": 20, "2xl": 24, "3xl": 32 },
+    "rules": [
+      "Poppins for screen titles, media titles and numerals in the premium timer.",
+      "Inter for body, labels and buttons.",
+      "Speed / ETA / size metrics use tabular figures (Inter tnum) or SpaceMono so digits do not jitter while progress updates.",
+      "Poppins font files must be added to frontend/assets/fonts (Inter and SpaceMono already exist). Remove Fraunces, Satoshi and SpaceGrotesk when Poppins lands."
+    ]
+  },
+  "spacing": {
+    "rule": "8pt-based rhythm. Use md (12) inside components and xl (24) between macro sections.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 8,
+    "md": 14,
+    "lg": 22,
+    "xl": 28,
+    "pill": 999
+  },
+  "elevation": {
+    "shadow_tier": "1",
+    "note": "Soft, low-opacity shadows in light theme; in dark theme depth comes from surface tiers and 1px borders, not shadows."
+  },
+  "navigation": {
+    "type": "bottom_tabs",
+    "tabs": ["Home", "Library", "Downloads", "Tools", "Settings"],
+    "android_mvp": "Custom glass tab bar (expo-blur over 75%+ surface tint).",
+    "ios_later": "Expo Router NativeTabs."
+  },
+  "icon_set": "MaterialCommunityIcons (@expo/vector-icons). Brand mark from memory/assets/Velo_Complete_Vector_Brand_Kit/icons/.",
+  "glassmorphism": {
+    "enabled": true,
+    "do": [
+      "Glass on the bottom tab bar, sticky headers, the Home URL card over the hero glow, and the floating player controls.",
+      "Always underlay glass with a surface tint of at least 75% so text stays readable.",
+      "Blur intensity is user-adjustable (Settings > Appearance > Glass intensity) and falls back to solid surfaceSecondary on low-end Android."
+    ],
+    "dont": [
+      "Never apply glass to list rows, form inputs, or dense queue/download cards.",
+      "Never use blur without an underlying tint layer.",
+      "Never stack more than one glass layer on top of another."
+    ]
+  },
+  "platform_libraries": {
+    "glass": { "android": "expo-blur", "ios": "expo-glass-effect", "low_end_android_fallback": "solid surfaceSecondary" },
+    "image": "expo-image",
+    "list": "@shopify/flash-list",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler",
+    "native_controls": "@expo/ui (BottomSheet, Picker, Slider, Switch, Menu). @gorhom/bottom-sheet only if a required sheet behavior is missing.",
+    "haptics": "expo-haptics"
+  },
+  "components": {
+    "GlassCard": "Blurred container + tint layer + 1px borderStrong at 40% opacity. Only where glassmorphism.do allows.",
+    "UrlInputBar": "Pill input with brandPrimary focus ring, Paste button, Analyze CTA using the brand gradient.",
+    "MediaTile": "expo-image thumbnail with mandatory top-to-bottom scrim (transparent to 80% scrim), title (Poppins), duration pill, status chip.",
+    "SourceRow": "surfaceSecondary row, thumb, title, creator - platform, StatusChip, overflow menu (Download, Redownload, Open Source, Copy URL, Share).",
+    "DownloadRow": "surfaceSecondary card, 0.5pt border, 2-3pt progress bar (brand gradient on surfaceTertiary track), right-aligned Pause/Resume/Cancel, tabular speed/ETA.",
+    "StatusChip": "Icon + label + status color at 16% tint fill.",
+    "FormatRow": "Resolution, label (4K/QHD/Full HD/HD), codec/container, estimated size; selected row uses brandTertiary fill and brandPrimary border.",
+    "QualityPresetControl": "Segmented pill: Best / Balanced / Data Saver / Custom.",
+    "PremiumTimer": "Poppins numerals, teal accent when active, 'Watch Ad +1 Hour' secondary button.",
+    "EmptyState": "Tinted logomark illustration + one line of copy + one CTA.",
+    "Toast": "Glass container allowed (transient), error variant carries a Retry action."
+  },
+  "screens": [
+    {
+      "name": "Home",
+      "route": "(tabs)/index",
+      "purpose": "One link to Detect to Resolve to Choose. Fast, obvious primary action.",
+      "states": {
+        "loading": "Brand-gradient ring spinner inside the URL card while analyzing.",
+        "empty": "Logomark illustration with 'Paste a link to get started.'",
+        "error": "Inline glass toast with failure reason and the actions allowed for that failure code."
+      },
+      "layout": "Top: soft radial brand glow over surface (hero). Glass URL card with pill input, Paste, Analyze. Clipboard-detected chip below. Then Active downloads (max 3, link to Downloads) and Recent sources in a 2-column MediaTile grid."
+    },
+    {
+      "name": "Library",
+      "route": "(tabs)/library",
+      "purpose": "Everything saved: downloaded media and persistent sources.",
+      "states": {
+        "loading": "Shimmering surfaceTertiary grid skeleton.",
+        "empty": "'Your library is empty.' + CTA to Home.",
+        "error": "Retry state."
+      },
+      "layout": "Sticky glass header: search + filter button + Grid/List toggle. Segmented [Media] [Sources]. Media = MediaTile grid (All / Videos / Images / Audio / Files chips). Sources = SourceRow list with status chips and 'File missing' badge."
+    },
+    {
+      "name": "Downloads",
+      "route": "(tabs)/downloads",
+      "purpose": "Tactical queue: active, waiting, failed, completed.",
+      "states": {
+        "loading": "Skeleton rows echoing progress bars.",
+        "empty": "'Queue is silent.'",
+        "error": "Failed cards pinned first with failure-specific actions (Retry, Open Source, Choose another format)."
+      },
+      "layout": "Strict list of DownloadRow. Section headers Active / Waiting / Failed / Completed. No glass on rows."
+    },
+    {
+      "name": "Source Details",
+      "route": "source/[id]",
+      "purpose": "The persistent source: metadata, actions, per-variant download history.",
+      "states": {
+        "loading": "Skeleton hero + rows.",
+        "empty": "N/A",
+        "error": "Source unavailable banner with Open Source / Copy URL."
+      },
+      "layout": "Hero thumbnail with scrim, title, creator, platform, dates. Primary Download (gradient) + Open Source, Copy URL, Share. Download History list (variant, status, date; 'File Missing' rows show Redownload)."
+    },
+    {
+      "name": "Format Picker",
+      "route": "sheets/format-picker",
+      "purpose": "Choose quality/format; remembers the previous choice.",
+      "states": { "loading": "Skeleton rows", "empty": "No formats: show reason + Open Source", "error": "Resolver failure with Try Another Resolver" },
+      "layout": "Form sheet: preset control, previous-selection banner ('1080p MP4 available' / '1080p unavailable, 720p available'), FormatRow list, Video/Audio toggle, Download button."
+    },
+    {
+      "name": "Tools",
+      "route": "(tabs)/tools",
+      "purpose": "Audio extraction and conversion.",
+      "states": { "loading": "Center spinner", "empty": "Select a file to begin.", "error": "Conversion failed toast with Retry." },
+      "layout": "List-based. Pill segmented controls for Format (MP3 / M4A / OPUS) and Bitrate; active option uses brandTertiary fill."
+    },
+    {
+      "name": "Player",
+      "route": "player/[id]",
+      "purpose": "Immersive playback.",
+      "states": { "loading": "Blurred artwork + spinner", "empty": "N/A", "error": "Fallback artwork with 'Unable to play media.'" },
+      "layout": "Edge-to-edge artwork/video, heavy bottom scrim, title (Poppins) in the bottom third, floating pill glass control bar in the bottom safe area. System header hidden."
+    },
+    {
+      "name": "Settings",
+      "route": "(tabs)/settings",
+      "purpose": "Appearance, downloads, organization, premium, sync, about.",
+      "states": { "loading": "N/A", "empty": "N/A", "error": "Inline row errors" },
+      "layout": "Grouped native-style sections (use @expo/ui where available): Appearance (Light/Dark/System, glass intensity), Downloads (Wi-Fi only, concurrency, default quality), Organization (folder + filename templates), Premium (timer, watch ad), Sync & account, About."
+    }
+  ],
+  "motion": {
+    "principles": ["Animate transform and opacity only", "Springs for gestures and sheets, timing for fades", "Respect Reduce Motion: replace movement with crossfade"],
+    "durations_ms": { "press": 120, "fade": 180, "sheet": 280, "screen": 320 },
+    "progress_bar": "Animated on the UI thread from a shared value fed by throttled (max 4 Hz) native progress events."
+  },
+  "accessibility": {
+    "contrast": "Body text at least 4.5:1 on its surface; brandPrimary is used as a fill with onBrandPrimary text, and its tinted text variant is onBrandTertiary on brandTertiary.",
+    "touch_targets": "At least 44x44 dp.",
+    "status": "Never rely on color alone: icon + label.",
+    "dynamic_type": "Layouts must survive 130% font scale."
+  },
+  "images": {
+    "app_icon": "memory/assets/Velo_Icon_Exports/velo-icon-1024x1024.png",
+    "logo_dark": "memory/assets/Velo_Complete_Vector_Brand_Kit/logos/velo-logo-dark.svg",
+    "logo_light": "memory/assets/Velo_Complete_Vector_Brand_Kit/logos/velo-logo-light.svg",
+    "logo_mark": "memory/assets/Velo_Complete_Vector_Brand_Kit/icons/velo-icon-transparent.svg",
+    "android_adaptive": "memory/assets/Velo_Complete_Vector_Brand_Kit/android/ (background / foreground XML)",
+    "splash": "Deep navy (#0A1020) with centered logomark + wordmark + tagline 'Save. Convert. Organize.'",
+    "hero_glow": "Generated in-app (radial brand-gradient at 25% opacity over surface); no remote stock photos."
+  },
+  "instructions_to_main_agent": [
+    "Use only tokens from color.dark / color.light via useTheme. Zero color literals in components.",
+    "The retired espresso/gold palette must not appear anywhere.",
+    "Poppins for display/titles, Inter for text; tabular figures for live metrics.",
+    "Every thumbnail gets the mandatory vertical scrim before overlaying text.",
+    "Glass only where glassmorphism.do allows, always over a 75%+ tint, with the low-end fallback.",
+    "Sheets, pickers, toggles and sliders: try @expo/ui first.",
+    "Every status uses icon + label + color.",
+    "Player is edge-to-edge with a floating glass control bar."
+  ],
+  "haptics": {
+    "button_press": "light",
+    "url_paste": "medium",
+    "tab_switch": "light",
+    "download_start": "success",
+    "download_complete": "success",
+    "download_failed": "error",
+    "queue_pause_resume": "rigid",
+    "format_toggle": "selection"
+  }
+}

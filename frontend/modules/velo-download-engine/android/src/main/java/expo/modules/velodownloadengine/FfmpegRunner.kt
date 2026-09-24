@@ -1,10 +1,13 @@
 package expo.modules.velodownloadengine
 
 import android.content.Context
+import android.util.Log
 import com.yausername.ffmpeg.FFmpeg
+import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
@@ -16,26 +19,51 @@ import java.util.concurrent.TimeUnit
  * into Matroska (.mkv), which accepts any codec combination without the MP4-spec questions VP9-in-MP4
  * raises — Android's own player (and ours, expo-video/ExoPlayer) plays MKV natively.
  *
- * The `FFmpeg` object from that library only extracts the bundled binary (see its `init`); it has
- * no execute method, so invocation here is our own ProcessBuilder code against the extracted path.
+ * On-device verification (2026-09-24) found the executable isn't where the library's `FFmpeg.init()`
+ * extracts to — that call only unpacks `libffmpeg.zip.so` into noBackupFilesDir, and that archive
+ * turns out to hold ffmpeg's *shared library dependencies* (libavcodec.so, libavformat.so, ...), not
+ * the ffmpeg binary itself. The actual executable ships as `libffmpeg.so` directly under the app's
+ * own native lib dir (`applicationInfo.nativeLibraryDir`) — Android extracts and marks it executable
+ * automatically like any other native lib, which is exactly why `useLegacyPackaging` (app.config.ts)
+ * had to be turned on: without it, native libs are mapped straight from the APK and never written to
+ * a real file at all, so nothing here would be runnable as a subprocess.
+ *
+ * ffmpeg's own dependency chain (libavfilter → libharfbuzz-cairo/libfontconfig/libx265/glib, pulled
+ * in eagerly by the dynamic linker at process start even though our `-c copy` command never uses
+ * those code paths) needs a few more shared libs than the `ffmpeg` package alone ships — libexpat,
+ * libcrypto and two small Termux compat shims. Traced via `readelf -d` against every extracted .so
+ * (2026-09-24). `youtubedl-android`'s own `YoutubeDL.executeImpl()` (its actual yt-dlp-invocation
+ * code, read from source) hits the exact same problem and solves it the same way this does: point
+ * `LD_LIBRARY_PATH` at *both* the `ffmpeg` package's lib dir and the `python` package's lib dir —
+ * Python's own build needs the same base libs for its ssl/xml stdlib modules, so its extraction
+ * already carries the ones `ffmpeg`'s package is missing. Hence `YoutubeDL.getInstance().init(ctx)`
+ * below even though this class never runs Python — it's only used for its side effect of extracting
+ * that lib directory.
  */
 object FfmpegRunner {
-  private var binary: File? = null
+  private var binaryPath: File? = null
+  private var ldLibraryPath: String? = null
 
   @Synchronized
-  private fun binary(ctx: Context): File {
-    binary?.let { return it }
-    FFmpeg.getInstance().init(ctx)
-    val root = File(ctx.noBackupFilesDir, "youtubedl-android/packages/ffmpeg")
-    // Exact internal layout of the extracted zip isn't part of the library's public API, so this
-    // searches for a file literally named "ffmpeg" rather than hardcoding a path — robust to that
-    // layout changing between library versions. NEEDS ON-DEVICE VERIFICATION: this couldn't be
-    // tested against a real extraction in this environment (no way to run compiled Kotlin here).
-    val found = root.walkTopDown().firstOrNull { it.isFile && it.name.equals("ffmpeg", ignoreCase = true) }
-      ?: throw EngineError(Code.FORMAT_UNAVAILABLE, "FFmpeg binary not found after extraction")
-    found.setExecutable(true)
-    binary = found
-    return found
+  private fun paths(ctx: Context): Pair<File, String> {
+    binaryPath?.let { bin -> ldLibraryPath?.let { lib -> return bin to lib } }
+    // Both throw their own *Exception on extraction failure — wrap so it's classified instead of
+    // falling through DownloadWorker's generic catch as an unlogged, detail-less UNKNOWN.
+    try {
+      FFmpeg.getInstance().init(ctx)
+      YoutubeDL.getInstance().init(ctx)
+    } catch (e: Exception) {
+      Log.e("FfmpegRunner", "FFmpeg/YoutubeDL init failed", e)
+      throw EngineError(Code.FORMAT_UNAVAILABLE, "FFmpeg init failed: ${e.message} (cause: ${e.cause})")
+    }
+    val bin = File(ctx.applicationInfo.nativeLibraryDir, "libffmpeg.so")
+    if (!bin.isFile) throw EngineError(Code.FORMAT_UNAVAILABLE, "FFmpeg binary not found at ${bin.path}")
+    val packages = File(ctx.noBackupFilesDir, "youtubedl-android/packages")
+    val lib = listOf(File(packages, "python/usr/lib"), File(packages, "ffmpeg/usr/lib"), File(ctx.applicationInfo.nativeLibraryDir))
+      .joinToString(":") { it.absolutePath }
+    binaryPath = bin
+    ldLibraryPath = lib
+    return bin to lib
   }
 
   /**
@@ -46,9 +74,17 @@ object FfmpegRunner {
    * downloader (Downloader.kt's runCancellable) was fixed for earlier.
    */
   suspend fun mergeToMkv(ctx: Context, video: File, audio: File, out: File) {
-    val ffmpeg = binary(ctx)
+    val (ffmpeg, ldLibraryPath) = paths(ctx)
     val cmd = listOf(ffmpeg.absolutePath, "-y", "-i", video.absolutePath, "-i", audio.absolutePath, "-c", "copy", "-map", "0:v:0", "-map", "1:a:0", out.absolutePath)
-    val process = ProcessBuilder(cmd).redirectErrorStream(true).start()
+    val builder = ProcessBuilder(cmd).redirectErrorStream(true)
+    builder.environment()["LD_LIBRARY_PATH"] = ldLibraryPath
+    val process = try {
+      builder.start()
+    } catch (e: IOException) {
+      // e.g. exec blocked (SELinux/W^X) or the binary isn't actually executable — surfaces as a
+      // classified failure instead of an unlogged UNKNOWN.
+      throw EngineError(Code.FORMAT_UNAVAILABLE, "Could not start FFmpeg: ${e.message}")
+    }
     try {
       val finished = runInterruptible(Dispatchers.IO) { process.waitFor(5, TimeUnit.MINUTES) }
       if (!finished) {

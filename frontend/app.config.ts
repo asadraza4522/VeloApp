@@ -45,7 +45,12 @@ const config: ExpoConfig = {
       },
     ],
     // Plain-HTTP is only enabled when a dev LAN worker is configured (never in release builds).
-    ["expo-build-properties", { android: { minSdkVersion: 29, usesCleartextTraffic: Boolean(process.env.EXPO_PUBLIC_DEV_WORKER_URL) } }],
+    // useLegacyPackaging: youtubedl-android's ffmpeg module unzips its bundled binary from its own
+    // .so file via plain file I/O (RandomAccessFile) — it assumes the old extract-to-disk native
+    // lib packaging. AGP's modern default (extractNativeLibs=false, libs mapped straight from the
+    // APK, never written to disk) makes that path ENOENT. Found via on-device testing (2026-09-24):
+    // "FileNotFoundException: .../lib/arm64/libffmpeg.zip.so" when FFmpeg.init() tried to unzip it.
+    ["expo-build-properties", { android: { minSdkVersion: 29, usesCleartextTraffic: Boolean(process.env.EXPO_PUBLIC_DEV_WORKER_URL), useLegacyPackaging: true } }],
     // AdMob app id: Google's sample id unless EXPO_PUBLIC_ADMOB_ANDROID_APP_ID is set (required for a real release build).
     ["react-native-google-mobile-ads", { androidAppId: process.env.EXPO_PUBLIC_ADMOB_ANDROID_APP_ID ?? "ca-app-pub-3940256099942544~3347511713", iosAppId: "ca-app-pub-3940256099942544~1458002511" }],
     [

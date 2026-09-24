@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -48,9 +49,14 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
       interrupted()
       throw e
     } catch (e: EngineError) {
+      Log.w(TAG, "task=$id postProcess=${task.postProcess} code=${e.code}: ${e.message}")
       fail(task, e.code, e.message)
       return Result.success() // failure is recorded; retries are decided by JS (network) or the user
     } catch (e: Throwable) {
+      // Anything not modeled as EngineError lands here as an opaque UNKNOWN with no detail in the
+      // UI — this Log.e is the only place the real cause survives, so it's the first thing to
+      // check (adb logcat -s DownloadWorker) whenever a download fails with "UNKNOWN".
+      Log.e(TAG, "task=$id postProcess=${task.postProcess} unexpected failure", e)
       fail(task, Code.UNKNOWN, e.message)
       return Result.success()
     }
@@ -154,6 +160,7 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
   }
 
   companion object {
+    private const val TAG = "DownloadWorker"
     // Concurrency cap is read once per process; changing it applies to the next process start.
     @Volatile private var permits = 3
     val gate: Semaphore by lazy { Semaphore(permits) }

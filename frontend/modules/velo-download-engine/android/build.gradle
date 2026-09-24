@@ -29,6 +29,11 @@ dependencies {
   // still requiring us to offer FFmpeg's source (Settings > About > Licenses). Fallback path only:
   // MediaProcessor's MediaMuxer stays the fast default for H.264/AAC; this covers codecs
   // MediaMuxer can't mux into MP4 (VP9/AV1 video-only + audio, seen on Instagram Reels).
+  // Required alongside `ffmpeg` — its FFmpeg.init() throws YoutubeDLException, a class that lives
+  // in this base module, not in `ffmpeg` itself. Missing this caused a NoClassDefFoundError that
+  // silently surfaced as an unlogged "UNKNOWN" download failure (see DownloadWorker.kt's catch-all
+  // Log.e added alongside this fix, which is what actually caught it).
+  implementation "io.github.junkfood02.youtubedl-android:library:0.18.1"
   implementation "io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1"
 
   testImplementation "junit:junit:4.13.2"

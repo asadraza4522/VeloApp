@@ -10,6 +10,7 @@ import { Button } from "@/components/button";
 import { AdBanner } from "@/components/ad-banner";
 import { Card } from "@/components/card";
 import { SourceRow } from "@/components/source-row";
+import { useTabBarHeight } from "@/hooks/use-tab-bar-height";
 import { useSources } from "@/db/hooks";
 import { usePremium } from "@/db/use-premium";
 import { formatRemaining } from "@/domain/monetization/premium";
@@ -51,6 +52,7 @@ export function HomeScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
   const [url, setUrl] = useState("");
   const [notice, setNotice] = useState("");
   const clip = useClipboardLink();
@@ -77,7 +79,7 @@ export function HomeScreen() {
 
   const data = run.data;
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: spacing.xxxl }} keyboardShouldPersistTaps="handled">
+    <ScrollView style={styles.root} contentContainerStyle={{ paddingBottom: tabBarHeight + spacing.xxxl }} keyboardShouldPersistTaps="handled">
       <View style={[styles.hero, { paddingTop: insets.top + spacing.xl }]}>
         <View style={styles.readyPill}>
           <View style={styles.readyDot} />
@@ -109,8 +111,8 @@ export function HomeScreen() {
           </Pressable>
         )}
         <View style={styles.actions}>
-          <Button label="Analyze" onPress={analyze} loading={run.isPending} disabled={!trimmed} grow />
-          <Button label="Save Link" variant="secondary" onPress={save} disabled={!trimmed} grow />
+          <Button label="Analyze" icon="magnify" onPress={analyze} loading={run.isPending} disabled={!trimmed} grow />
+          <Button label="Save Link" icon="bookmark-outline" variant="secondary" onPress={save} disabled={!trimmed} grow />
         </View>
       </Card>
 
@@ -121,7 +123,7 @@ export function HomeScreen() {
         <Card style={styles.result}>
           <Text style={styles.resultTitle}>{MESSAGES[data.code] ?? "Couldn't analyze this link."}</Text>
           <Text style={styles.meta}>{data.code} · {actionsFor(data.code).join(", ")}</Text>
-          <Button label="Open saved source" variant="secondary" onPress={() => openSource(data.source.id)} />
+          <Button label="Open saved source" icon="open-in-new" variant="secondary" onPress={() => openSource(data.source.id)} />
         </Card>
       )}
 
@@ -132,8 +134,8 @@ export function HomeScreen() {
           <Text style={styles.meta}>{[data.result.metadata.creator, data.result.metadata.platform].filter(Boolean).join(" · ")}</Text>
           {data.result.variants.length === 0 && <Text style={styles.meta}>Saved. Nothing downloadable was found for this link right now.</Text>}
           <View style={styles.actions}>
-            <Button label="Choose quality" onPress={() => openPicker(data.source.id)} disabled={data.result.variants.length === 0} grow />
-            <Button label="Details" variant="secondary" onPress={() => openSource(data.source.id)} grow />
+            <Button label="Choose quality" icon="tune" onPress={() => openPicker(data.source.id)} disabled={data.result.variants.length === 0} grow />
+            <Button label="Details" icon="information-outline" variant="secondary" onPress={() => openSource(data.source.id)} grow />
           </View>
         </Card>
       )}

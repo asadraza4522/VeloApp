@@ -22,6 +22,12 @@ export type Options = { video: QualityOption[]; audio: AudioOption[]; other: Oth
 const TAGS: Record<number, string> = { 2160: "4K", 1440: "QHD", 1080: "Full HD", 720: "HD" };
 const isMp4 = (v: MediaVariant) => v.container === "mp4" || v.container === "m4v";
 const isAac = (v: MediaVariant) => v.container === "m4a" || (v.audio_codec ?? "").startsWith("mp4a");
+// A platform can label a container "mp4" while the video track inside is VP9/AV1 (seen on
+// Instagram Reels) — the container name alone doesn't mean our native MediaMuxer can mux it: it
+// only muxes H.264/AAC into MP4 (no re-encode, no FFmpeg yet). Muxability must check the actual
+// video codec, not just the container label, or the app offers a download that silently fails
+// (or produces a corrupt file) at mux time on-device.
+const isFastMuxVideo = (v: MediaVariant) => isMp4(v) && (v.video_codec ?? "").startsWith("avc");
 const rank = (v: MediaVariant) => [isMp4(v) ? 1 : 0, (v.video_codec ?? "").startsWith("avc") ? 1 : 0, v.bitrate ?? 0] as const;
 const better = (a: MediaVariant, b: MediaVariant) => {
   const [x, y] = [rank(a), rank(b)];
@@ -44,13 +50,22 @@ export function buildOptions(variants: MediaVariant[]): Options {
       return { ...base, detail: [progressive.container.toUpperCase(), formatBytes(progressive.filesize), "includes audio"].filter((s) => s !== "—").join(" · "), sizeBytes: progressive.filesize ?? null, selection: { mode: "single", variant: progressive } };
     }
     const videoOnly = https.filter((v) => !v.has_audio).sort(better);
-    const muxable = videoOnly.filter(isMp4).pop();
-    const audio = muxable ? pickAudioFor(muxable, all) : null;
-    if (muxable && audio && isAac(audio)) {
-      const size = sum(muxable.filesize, audio.filesize);
-      return { ...base, detail: ["MP4", formatBytes(size), "audio added automatically"].filter((s) => s !== "—").join(" · "), sizeBytes: size, selection: { mode: "mux", video: muxable, audio } };
+    // Fast path first (no re-encode, on-device MediaMuxer, MP4 out): H.264 video + AAC audio.
+    const fastVideo = videoOnly.filter(isFastMuxVideo).pop();
+    const fastAudio = fastVideo ? pickAudioFor(fastVideo, all) : null;
+    if (fastVideo && fastAudio && isAac(fastAudio)) {
+      const size = sum(fastVideo.filesize, fastAudio.filesize);
+      return { ...base, detail: ["MP4", formatBytes(size), "audio added automatically"].filter((s) => s !== "—").join(" · "), sizeBytes: size, selection: { mode: "mux", video: fastVideo, audio: fastAudio } };
     }
-    const reason = !https.length ? "Streaming format: needs the FFmpeg module" : muxable ? "No AAC audio to merge with" : "WebM/VP9 can't be merged yet (needs the FFmpeg module)";
+    // Fallback (any other codec — VP9/AV1 video-only, seen on Instagram Reels): FFmpeg stream-copies
+    // into Matroska, no re-encode either, just a container that isn't fussy about what's inside it.
+    const anyVideo = videoOnly.pop();
+    const anyAudio = anyVideo ? pickAudioFor(anyVideo, all) : null;
+    if (anyVideo && anyAudio) {
+      const size = sum(anyVideo.filesize, anyAudio.filesize);
+      return { ...base, detail: ["MKV", formatBytes(size), "merged with FFmpeg"].filter((s) => s !== "—").join(" · "), sizeBytes: size, selection: { mode: "mux", video: anyVideo, audio: anyAudio } };
+    }
+    const reason = !https.length ? "Streaming format: needs the FFmpeg module" : anyVideo ? "No audio track to merge with" : "No downloadable video track at this resolution";
     return { ...base, detail: reason, sizeBytes: null, selection: null, blocked: reason };
   });
 

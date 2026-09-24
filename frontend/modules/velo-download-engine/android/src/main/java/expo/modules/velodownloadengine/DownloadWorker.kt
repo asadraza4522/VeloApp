@@ -71,7 +71,7 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
     Notifications.failed(applicationContext, id, task.title, code)
   }
 
-  private fun execute(task: TaskRecord, downloader: Downloader) {
+  private suspend fun execute(task: TaskRecord, downloader: Downloader) {
     val ctx = applicationContext
     val dir = DownloadScheduler.tempDir(ctx)
     val bins = mutableListOf<File>()
@@ -116,6 +116,17 @@ class DownloadWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(c
         val v = bins[task.parts.indexOfFirst { it.role == "video" }.coerceAtLeast(0)]
         val a = bins[task.parts.indexOfFirst { it.role == "audio" }.let { if (it < 0) 1 else it }]
         File(dir, "$id.out.mp4").also { MediaProcessor.mux(v, a, it) }
+      }
+      // Codec combos MediaMuxer's MP4 writer can't mux (VP9/AV1 video-only + audio — Instagram
+      // Reels) — the format picker (quality.ts) only offers this postProcess for exactly that
+      // case, so no MediaMuxer attempt first. See FfmpegRunner.
+      "mux-ffmpeg" -> {
+        enterProcessing(task)
+        val v = bins[task.parts.indexOfFirst { it.role == "video" }.coerceAtLeast(0)]
+        val a = bins[task.parts.indexOfFirst { it.role == "audio" }.let { if (it < 0) 1 else it }]
+        val mkv = File(dir, "$id.out.mkv")
+        FfmpegRunner.mergeToMkv(applicationContext, v, a, mkv)
+        mkv
       }
       "extract-audio" -> {
         enterProcessing(task)

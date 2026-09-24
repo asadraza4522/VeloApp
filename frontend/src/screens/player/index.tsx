@@ -9,6 +9,7 @@ import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/components/button";
+import { IconButton } from "@/components/icon-button";
 import { db } from "@/db/client";
 import { downloads, mediaSources } from "@/db/schema";
 import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow, useTheme } from "@/design/theme";
@@ -26,15 +27,13 @@ function load(downloadId: string): Item | "missing" | null {
   return { uri: row.uri, title: row.title ?? row.filename ?? "Untitled", creator: row.creator, thumbnail: row.thumb, sourceId: row.sourceId, audio };
 }
 
+// Over video/artwork, same reason as Source Details' back button (design_guidelines.json
+// components.IconButton): a bare tinted icon over unpredictable content is invisible some of the
+// time. IconButton's opaque circle is the only approved pattern for this.
 function Close({ onPress }: { onPress: () => void }) {
   const styles = useStyles();
-  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="Close player" style={[styles.close, { top: insets.top + spacing.sm }]}>
-      <MaterialCommunityIcons name="close" size={22} color={colors.onSurface} />
-    </Pressable>
-  );
+  return <IconButton icon="close" onPress={onPress} label="Close player" size={44} iconSize={22} style={[styles.close, { top: insets.top + spacing.sm }]} />;
 }
 
 function VideoScreen({ item, onClose }: { item: Item; onClose: () => void }) {
@@ -42,7 +41,18 @@ function VideoScreen({ item, onClose }: { item: Item; onClose: () => void }) {
   const player = useVideoPlayer(item.uri, (p) => { p.play(); });
   return (
     <View style={styles.black}>
-      <VideoView player={player} style={styles.fill} nativeControls contentFit="contain" allowsPictureInPicture />
+      <VideoView
+        player={player}
+        style={styles.fill}
+        nativeControls
+        contentFit="contain"
+        allowsPictureInPicture
+        // The app is portrait-locked overall (app.config.ts orientation: "portrait"), but the
+        // fullscreen button should rotate to landscape like YouTube/any other player. expo-video's
+        // fullscreen mode runs in its own native surface independent of the app's orientation
+        // lock, so this alone is enough — no need to touch the app's global orientation.
+        fullscreenOptions={{ enable: true, orientation: "landscape", autoExitOnRotate: true }}
+      />
       <Close onPress={onClose} />
     </View>
   );
@@ -134,7 +144,7 @@ const useStyles = makeStyles((c) => ({
   black: { flex: 1, backgroundColor: "#000" },
   audio: { flex: 1, backgroundColor: c.surfaceInverse },
   center: { flex: 1, alignItems: "center", justifyContent: "center", gap: spacing.lg, padding: spacing.xl, backgroundColor: c.surface },
-  close: { position: "absolute", left: spacing.lg, zIndex: 5, width: 44, height: 44, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: c.surfaceTertiary, borderWidth: 1.5, borderColor: c.border, ...tactileShadow(2, c.border) },
+  close: { position: "absolute", left: spacing.lg, zIndex: 5 },
   audioBody: { flex: 1, justifyContent: "flex-end", alignItems: "center", gap: spacing.md, paddingHorizontal: spacing.xl },
   art: { width: 260, height: 260, borderRadius: radius.sm, backgroundColor: c.surfaceTertiary, marginBottom: spacing.lg, borderWidth: 1.5, borderColor: c.border, ...tactileShadow(3, c.border) },
   artEmpty: { alignItems: "center", justifyContent: "center" },

@@ -54,7 +54,7 @@ export function DuplicatesScreen() {
 
   return (
     <ToolScreen title="Duplicate finder" intro="Finds downloaded files with identical content. Files are compared by size first, then by a checksum, so only real duplicates are listed.">
-      <Button label={groups ? "Scan again" : "Scan my downloads"} onPress={() => void scan()} loading={busy} />
+      <Button label={groups ? "Scan again" : "Scan my downloads"} icon="magnify-scan" onPress={() => void scan()} loading={busy} />
       {progress !== "" && <Text style={styles.meta}>{progress}</Text>}
       {groups && groups.length === 0 && <Text style={styles.meta}>No duplicates found.</Text>}
       {groups && groups.length > 0 && (
@@ -66,7 +66,7 @@ export function DuplicatesScreen() {
               <Text style={styles.meta}>{formatBytes(g.size)} · keeping the oldest, {g.extras.length} extra {g.extras.length === 1 ? "copy" : "copies"}</Text>
             </Card>
           ))}
-          <Button label="Delete extra copies" variant="secondary" onPress={removeExtras} loading={busy} />
+          <Button label="Delete extra copies" icon="trash-can-outline" variant="destructive" onPress={removeExtras} loading={busy} />
         </>
       )}
       {message !== "" && <Text style={styles.ok}>{message}</Text>}

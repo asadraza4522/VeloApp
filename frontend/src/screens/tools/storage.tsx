@@ -1,15 +1,17 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 
 import { Button } from "@/components/button";
 import { ToolScreen } from "@/components/tool-screen";
-import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow } from "@/design/theme";
+import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow, useTheme } from "@/design/theme";
 import { largest, olderThan, totalBytes, usageByPlatform, type StoredFile } from "@/domain/tools/storage";
 import { deleteFile, loadLiveFiles } from "@/screens/tools/library-helpers";
 import { formatBytes } from "@/utils/format";
 
 export function StorageScreen() {
   const styles = useStyles();
+  const { colors } = useTheme();
   const [files, setFiles] = useState<(StoredFile & { downloadId: string })[] | null>(null);
   const [message, setMessage] = useState("");
 
@@ -42,7 +44,7 @@ export function StorageScreen() {
         <>
           <Text style={styles.total}>{formatBytes(totalBytes(files))}</Text>
           <Text style={styles.meta}>{files.length} downloaded files on this device</Text>
-          <Button label="Delete files older than 30 days" variant="secondary" onPress={() => confirmDelete("files older than 30 days", olderThan(files, 30))} disabled={!olderThan(files, 30).length} />
+          <Button label="Delete files older than 30 days" icon="trash-can-outline" variant="destructive" onPress={() => confirmDelete("files older than 30 days", olderThan(files, 30))} disabled={!olderThan(files, 30).length} />
 
           <Text style={styles.section}>By platform</Text>
           {usage.map((u) => (
@@ -51,7 +53,10 @@ export function StorageScreen() {
                 <Text style={styles.title}>{u.platform}</Text>
                 <Text style={styles.meta}>{u.count} files · {formatBytes(u.bytes)}</Text>
               </View>
-              <Pressable style={styles.small} onPress={() => confirmDelete(`all ${u.platform} files`, files.filter((f) => f.platform === u.platform))}><Text style={styles.smallText}>Delete</Text></Pressable>
+              <Pressable style={styles.small} onPress={() => confirmDelete(`all ${u.platform} files`, files.filter((f) => f.platform === u.platform))}>
+                <MaterialCommunityIcons name="trash-can-outline" size={14} color={colors.onErrorSurface} />
+                <Text style={styles.smallText}>Delete</Text>
+              </Pressable>
             </View>
           ))}
 
@@ -62,7 +67,10 @@ export function StorageScreen() {
                 <Text style={styles.title} numberOfLines={1}>{f.title}</Text>
                 <Text style={styles.meta}>{f.platform} · {formatBytes(f.size)}</Text>
               </View>
-              <Pressable style={styles.small} onPress={() => confirmDelete(`“${f.title}”`, [f])}><Text style={styles.smallText}>Delete</Text></Pressable>
+              <Pressable style={styles.small} onPress={() => confirmDelete(`“${f.title}”`, [f])}>
+                <MaterialCommunityIcons name="trash-can-outline" size={14} color={colors.onErrorSurface} />
+                <Text style={styles.smallText}>Delete</Text>
+              </Pressable>
             </View>
           ))}
         </>
@@ -79,6 +87,6 @@ const useStyles = makeStyles((c) => ({
   section: { marginTop: spacing.md, fontFamily: fonts.overline, fontSize: fontSize.overline, color: c.mutedSecondary, textTransform: "uppercase", letterSpacing: 0.5 },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.md, padding: spacing.md, borderRadius: radius.sm, backgroundColor: c.surfaceTertiary, borderWidth: 1.5, borderColor: c.border, ...tactileShadow(2, c.border) },
   title: { fontFamily: fonts.textSemiBold, fontSize: fontSize.body, color: c.onSurface },
-  small: { paddingHorizontal: spacing.md, paddingVertical: 6, borderRadius: radius.sm, backgroundColor: c.errorSurface, borderWidth: 1.5, borderColor: c.errorBorder },
+  small: { flexDirection: "row", alignItems: "center", gap: spacing.xs, paddingHorizontal: spacing.md, paddingVertical: 6, borderRadius: radius.sm, backgroundColor: c.errorSurface, borderWidth: 1.5, borderColor: c.errorBorder },
   smallText: { fontFamily: fonts.textMedium, fontSize: fontSize.caption, color: c.onErrorSurface },
 }));

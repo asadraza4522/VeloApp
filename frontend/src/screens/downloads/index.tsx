@@ -7,6 +7,7 @@ import { DownloadRow } from "@/components/download-row";
 import { useQueue } from "@/db/hooks";
 import { QUEUE_GROUPS, type QueueRow } from "@/db/queries/downloads";
 import { fonts, fontSize, makeStyles, spacing } from "@/design/theme";
+import { useTabBarHeight } from "@/hooks/use-tab-bar-height";
 
 const LIMIT = 100;
 type Item = { kind: "header"; id: string; label: string } | { kind: "row"; id: string; row: QueueRow };
@@ -23,6 +24,7 @@ const keyExtractor = (item: Item) => item.id;
 export function DownloadsScreen() {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
   const active = useQueue(QUEUE_GROUPS.active, LIMIT);
   const waiting = useQueue(QUEUE_GROUPS.waiting, LIMIT);
   const failed = useQueue(QUEUE_GROUPS.failed, LIMIT);
@@ -42,7 +44,7 @@ export function DownloadsScreen() {
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <Text style={styles.title}>Downloads</Text>
       {data.length ? (
-        <FlashList data={data} renderItem={renderItem} getItemType={getItemType} keyExtractor={keyExtractor} />
+        <FlashList data={data} renderItem={renderItem} getItemType={getItemType} keyExtractor={keyExtractor} contentContainerStyle={{ paddingBottom: tabBarHeight }} />
       ) : (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>Queue is silent.</Text>

@@ -19,7 +19,7 @@ export type NativeDownloadJob = {
   relativePath: string;
   filename: string;
   mime: string;
-  postProcess: 'none' | 'mux' | 'extract-audio';
+  postProcess: 'none' | 'mux' | 'mux-ffmpeg' | 'extract-audio';
   title: string;
 };
 

@@ -16,7 +16,7 @@ const v = (o: Partial<MediaVariant>): MediaVariant => ({
   has_video: true, has_audio: true, ...o,
 });
 const PROGRESSIVE = v({ id: "22", height: 720, filesize: 1000, url: "https://cdn.example.com/22" });
-const VIDEO_ONLY = v({ id: "137", height: 1080, has_audio: false, filesize: 4000, url: "https://cdn.example.com/137" });
+const VIDEO_ONLY = v({ id: "137", height: 1080, has_audio: false, video_codec: "avc1", filesize: 4000, url: "https://cdn.example.com/137" });
 const AAC = v({ id: "140", type: "audio", container: "m4a", has_video: false, audio_codec: "mp4a.40.2", bitrate: 129_000, filesize: 500, url: "https://cdn.example.com/140" });
 const OPUS = v({ id: "251", type: "audio", container: "webm", has_video: false, audio_codec: "opus", bitrate: 160_000, url: "https://cdn.example.com/251" });
 
@@ -69,10 +69,17 @@ describe("startDownload", () => {
   it("rejects unsupported selections before writing anything", async () => {
     const hls = v({ id: "h", protocol: "hls" });
     await expect(startDownload(deps, source, { mode: "single", variant: hls })).rejects.toThrow(UnsupportedSelectionError);
-    expect(() => selectionFor(VIDEO_ONLY, [VIDEO_ONLY, OPUS])).not.toThrow(); // opus is a fallback partner…
-    await expect(startDownload(deps, source, selectionFor(VIDEO_ONLY, [VIDEO_ONLY, OPUS]))).rejects.toThrow(UnsupportedSelectionError); // …but not muxable into mp4
     expect(db.select().from(downloads).all()).toHaveLength(0);
     expect(engine.jobs).toHaveLength(0);
+  });
+
+  // 2026-09-23, Instagram Reels: opus audio isn't AAC, so it's not muxable into MP4 by the fast
+  // on-device path — but it IS still downloadable via the FFmpeg fallback (MKV, stream-copy).
+  it("pairs with a non-AAC audio track via the FFmpeg/MKV fallback instead of refusing", async () => {
+    expect(() => selectionFor(VIDEO_ONLY, [VIDEO_ONLY, OPUS])).not.toThrow(); // opus is a fallback partner…
+    const d = await startDownload(deps, source, selectionFor(VIDEO_ONLY, [VIDEO_ONLY, OPUS]));
+    expect(engine.jobs[0]).toMatchObject({ postProcess: "mux-ffmpeg", filename: "Demo Video.mkv" });
+    expect(d.container).toBe("mkv");
   });
 
   it("fails the download (source kept) when the engine refuses the job", async () => {

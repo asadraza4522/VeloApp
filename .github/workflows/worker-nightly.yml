@@ -1,0 +1,20 @@
+name: worker-nightly
+on:
+  schedule:
+    - cron: "0 3 * * *" # yt-dlp/gallery-dl freshness — platforms break weekly (plan §Risks)
+  workflow_dispatch:
+
+jobs:
+  rebuild-deploy:
+    # Render caches Docker layers, so a plain push-triggered deploy won't pick up a newer yt-dlp/
+    # gallery-dl if worker/ source hasn't changed. clearCache forces a real `pip install .` rerun.
+    # Needs RENDER_API_KEY (Render dashboard > Account Settings > API Keys, free, no card) and
+    # RENDER_SERVICE_ID (from the service's URL: dashboard.render.com/web/<this-id>).
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -fsS -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": "clear"}'

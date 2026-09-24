@@ -196,7 +196,8 @@
     "Toast": "surfaceTertiary card, 1.5px solid border, shadow 4px 4px 0 (raised tier), error variant carries a Retry SecondaryButton. No blur (toasts are content, not chrome).",
     "Switch": "Track 38x22, 1.5px solid ink outline. Off: surfaceSecondary track, white knob with ink outline. On: brandPrimary (or successSurface for a 'safe/verified' toggle) track, ink knob outline, tactile offset shadow on the knob only.",
     "Checkbox": "18x18 square, radius xs (4), 1.5px solid ink, white fill, shadow 1.5px 1.5px 0. Checked: brandPrimary fill + ink checkmark.",
-    "Radio": "18x18 circle, 1.5px solid ink. Checked: solid ink inner dot on a brandPrimary ring."
+    "Radio": "18x18 circle, 1.5px solid ink. Checked: solid ink inner dot on a brandPrimary ring.",
+    "IconButton": "MANDATORY for any icon control placed over a thumbnail, hero image, video frame, blurred artwork, or any other content whose color isn't controlled by us — never a bare tinted icon directly on top of it. Opaque circle (default 44x44, `iconSize` 22), surfaceTertiary fill, 1.5px solid ink border, tactile-offset shadow (2px), ink icon. Guarantees contrast no matter what the underlying image looks like at that exact spot. Found missing 2026-09-23 on Source Details' native transparent header back button, which sat directly over the hero photo and disappeared whenever the photo's top edge was dark — a bug invisible in review/screenshots that only showed up per-image on a real device, exactly the kind of thing that makes an app feel unfinished. `frontend/src/components/icon-button.tsx`. Used by: Source Details' header back button (via `headerLeft`), Player's Close/back control. Any future screen with a header/controls over media (hero banners, video thumbnails, cover art) must use this, not `headerTintColor` alone and not a raw `Pressable` + icon."
   },
   "screens": [
     {
@@ -298,7 +299,8 @@
     "contrast": "Body text at least 4.5:1 on its surface. Ink-on-cream and ink-on-amber both pass comfortably; onBrandPrimary is always #1C1B1B (never white) because #FFC800 is too light for white text.",
     "touch_targets": "At least 44x44 dp — confirmed in the mockups (`min-w-[44px] min-h-[44px]` on icon buttons). The compact 18x18 checkbox/radio glyphs still need a 44x44 hit slop.",
     "status": "Never rely on color alone: icon + label, reinforced by the ink border so status is legible even at low vision / grayscale.",
-    "dynamic_type": "Layouts must survive 130% font scale — tactile cards have fixed-looking borders/shadows but must not clip text; let card height grow."
+    "dynamic_type": "Layouts must survive 130% font scale — tactile cards have fixed-looking borders/shadows but must not clip text; let card height grow.",
+    "controls_over_media": "A control's contrast can never depend on what a user's thumbnail/photo/video happens to look like at that pixel — that fails silently and differently for every piece of content, which is exactly the kind of bug that erodes a 'premium' feel because it's invisible in testing until the wrong image shows up. Every icon control over a thumbnail, hero image, video frame or artwork uses the IconButton component (components.IconButton) — an opaque backdrop, not a bare tinted icon on `headerTintColor`/`headerTransparent` or a raw `Pressable`. This applies to header back buttons, close buttons, any future overlay control (favorite-on-thumbnail, more-menu-on-hero, etc)."
   },
   "images": {
     "app_icon": "memory/assets/Velo_Icon_Exports/velo-icon-1024x1024.png",
@@ -315,6 +317,7 @@
     "Plus Jakarta Sans for everything (display through body/labels); JetBrains Mono for hashes/paths/timestamps/live numeric metrics.",
     "Blur/translucency is allowed ONLY on the fixed Header and bottom TabBar (see elevation.chrome_exception). Everywhere else: zero blur, zero glass, zero gradients — depth is a solid ink border + hard offset shadow only.",
     "Every thumbnail still gets the mandatory vertical scrim before overlaying text.",
+    "Never place a bare tinted icon (headerTintColor, or a plain Pressable+icon with no backdrop) over a thumbnail/hero/video/artwork — use IconButton (components.IconButton, accessibility.controls_over_media). A native transparent header back button is the easy way to miss this: override headerLeft with IconButton whenever headerTransparent is true and the header sits over media.",
     "Sheets, pickers, toggles and sliders: try @expo/ui first, restyle its colors to the ink/amber tokens; only build a custom tactile control where @expo/ui cannot take custom colors/borders.",
     "Every status uses icon + label + color per status_colors (a *Surface fill + a plain ink border), never a raw opacity tint.",
     "Press states must show the translate-by-shadow-offset + shadow-collapse tactile feedback on every bordered/shadowed interactive element (buttons, cards that are pressable, chips).",

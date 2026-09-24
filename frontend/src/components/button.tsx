@@ -1,12 +1,24 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Pressable, Text } from "react-native";
 
-import { fonts, fontSize, makeStyles, radius, tactileShadow, useTheme } from "@/design/theme";
+import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow, useTheme } from "@/design/theme";
 
-type Props = { label: string; onPress: () => void; variant?: "primary" | "secondary" | "ghost" | "destructive"; disabled?: boolean; loading?: boolean; grow?: boolean };
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+type Props = {
+  label: string;
+  onPress: () => void;
+  variant?: "primary" | "secondary" | "ghost" | "destructive";
+  icon?: IconName;
+  disabled?: boolean;
+  loading?: boolean;
+  grow?: boolean;
+};
+
+const ICON_COLOR = { primary: "onBrandPrimary", secondary: "onSurface", ghost: "onSurface", destructive: "onErrorSurface" } as const;
 
 // Press feedback (design_guidelines.json motion.principles): translate by the resting shadow's
 // offset and drop the shadow to none — the theme's one universal tactile interaction.
-export function Button({ label, onPress, variant = "primary", disabled, loading, grow }: Props) {
+export function Button({ label, onPress, variant = "primary", icon, disabled, loading, grow }: Props) {
   const styles = useStyles();
   const { colors } = useTheme();
   const shadowed = variant === "primary" || variant === "secondary";
@@ -25,16 +37,19 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={variant === "primary" ? colors.onBrandPrimary : colors.onSurface} />
+        <ActivityIndicator color={colors[ICON_COLOR[variant]]} />
       ) : (
-        <Text style={[styles.text, styles[`${variant}Text`]]}>{label}</Text>
+        <>
+          {icon && <MaterialCommunityIcons name={icon} size={18} color={colors[ICON_COLOR[variant]]} />}
+          <Text style={[styles.text, styles[`${variant}Text`]]}>{label}</Text>
+        </>
       )}
     </Pressable>
   );
 }
 
 const useStyles = makeStyles((c) => ({
-  base: { minHeight: 44, paddingHorizontal: 20, alignItems: "center", justifyContent: "center", borderRadius: radius.sm, borderWidth: 1.5, borderColor: c.border },
+  base: { flexDirection: "row", gap: spacing.xs, minHeight: 44, paddingHorizontal: 20, alignItems: "center", justifyContent: "center", borderRadius: radius.sm, borderWidth: 1.5, borderColor: c.border },
   grow: { flex: 1 },
   disabled: { opacity: 0.5 },
   resting: tactileShadow(2, c.border),

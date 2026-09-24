@@ -23,6 +23,13 @@ android {
 dependencies {
   implementation "androidx.work:work-runtime-ktx:2.10.0"
   implementation "com.squareup.okhttp3:okhttp:4.12.0"
+  // GPLv3 (Termux ffmpeg build, same artifact Seal ships). Invoked as a genuinely separate
+  // subprocess (ProcessBuilder, not JNI/static linking) — this is only a runtime dependency, not
+  // a compile-time link into our own binary, keeping our own code outside the GPL boundary while
+  // still requiring us to offer FFmpeg's source (Settings > About > Licenses). Fallback path only:
+  // MediaProcessor's MediaMuxer stays the fast default for H.264/AAC; this covers codecs
+  // MediaMuxer can't mux into MP4 (VP9/AV1 video-only + audio, seen on Instagram Reels).
+  implementation "io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1"
 
   testImplementation "junit:junit:4.13.2"
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0"

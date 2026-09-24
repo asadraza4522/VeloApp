@@ -29,11 +29,35 @@ describe("buildOptions", () => {
     expect(by["1080p"].sizeBytes).toBe(70_000_000 + 5_000_000); // the higher-bitrate avc stream (299) + AAC
   });
 
-  it("marks what can't be downloaded yet, with a reason", () => {
+  it("marks streaming (HLS/DASH) formats as blocked — no FFmpeg for that yet", () => {
     const by = Object.fromEntries(o.video.map((x) => [x.label, x]));
-    expect(by["2160p"]).toMatchObject({ selection: null, tag: "4K" });
-    expect(by["2160p"].blocked).toMatch(/WebM|FFmpeg/);
     expect(by["480p"].blocked).toMatch(/Streaming/);
+  });
+
+  // 2026-09-23, Instagram Reels: a platform can label a container "mp4" while the video track
+  // inside is actually VP9 — MediaMuxer's fast on-device MP4 path only accepts H.264/AAC, so this
+  // must NOT be offered as a plain "mux" (it would silently fail at mux time on-device). It's
+  // still downloadable, just via the FFmpeg fallback (Matroska output, stream-copy, no re-encode).
+  it("VP9/AV1 video (even mislabeled with an mp4 container) downloads via the FFmpeg/MKV fallback, not the fast MP4 path", () => {
+    const by = Object.fromEntries(o.video.map((x) => [x.label, x]));
+    expect(by["2160p"].selection?.mode).toBe("mux"); // job.ts decides mux vs mux-ffmpeg from the actual codec at build time
+    expect(by["2160p"].detail).toMatch(/MKV/);
+    expect(by["2160p"].detail).toMatch(/FFmpeg/);
+    expect(by["2160p"].tag).toBe("4K");
+
+    const withMislabeledVp9 = [
+      v({ id: "1", height: 1080, has_audio: false, container: "mp4", video_codec: "vp09.00.40.08", filesize: 9_000_000 }),
+      v({ id: "2", type: "audio", container: "m4a", has_video: false, audio_codec: "mp4a.40.5", bitrate: 62_000, filesize: 500_000 }),
+    ];
+    const opt = buildOptions(withMislabeledVp9).video[0];
+    expect(opt.selection?.mode).toBe("mux");
+    expect(opt.detail).toMatch(/MKV/);
+  });
+
+  it("blocks video-only formats that have no audio track to merge with, at all", () => {
+    const noAudio = buildOptions([v({ id: "1", height: 720, has_audio: false, video_codec: "vp9", filesize: 1000 })]);
+    expect(noAudio.video[0].selection).toBeNull();
+    expect(noAudio.video[0].blocked).toMatch(/audio/);
   });
 
   it("audio-only offers AAC/M4A only", () => {
@@ -55,7 +79,7 @@ describe("buildOptions", () => {
 
 describe("presets", () => {
   const { video } = buildOptions(VARIANTS);
-  it("best skips blocked rows", () => expect(pickPreset(video, "best")?.label).toBe("1080p"));
+  it("best skips blocked rows", () => expect(pickPreset(video, "best")?.label).toBe("2160p")); // now downloadable via the FFmpeg/MKV fallback
   it("balanced is at most 720p", () => expect(pickPreset(video, "balanced")?.label).toBe("720p"));
   it("data saver is the smallest usable, not below 360p", () => expect(pickPreset(video, "dataSaver")?.label).toBe("360p"));
   it("no options → null", () => expect(pickPreset([], "best")).toBeNull());

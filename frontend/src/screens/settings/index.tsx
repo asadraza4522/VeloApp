@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { db } from "@/db/client";
@@ -11,6 +11,7 @@ import { seedSources } from "@/db/seed";
 import { downloads, mediaSources, outbox, sourceUrls } from "@/db/schema";
 import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow } from "@/design/theme";
 import { Card } from "@/components/card";
+import { useTabBarHeight } from "@/hooks/use-tab-bar-height";
 import { getSyncManager, isBackendConfigured } from "@/native/sync-runtime";
 import { timeAgo } from "@/utils/format";
 import { useState } from "react";
@@ -126,15 +127,33 @@ function OrganizationSection() {
   );
 }
 
+// GPL §6 requires offering the source for any GPL component we ship, not just crediting it — a
+// permanent obligation, not decorative. FFmpeg here is the Termux build bundled by
+// io.github.junkfood02.youtubedl-android:ffmpeg (2026-09-23, added to unblock VP9-only platforms
+// like Instagram Reels — MediaMuxer alone can't mux those). It runs as a genuinely separate
+// subprocess (FfmpegRunner.kt), never linked into our own binary.
+function AboutSection() {
+  const styles = useStyles();
+  return (
+    <Card style={styles.section}>
+      <Text style={styles.sectionTitle}>About</Text>
+      <Text style={styles.label}>Open-source components</Text>
+      <DevButton label="FFmpeg (GPLv3) — source code" onPress={() => void Linking.openURL("https://github.com/yausername/youtubedl-android/blob/master/BUILD_FFMPEG.md")} />
+    </Card>
+  );
+}
+
 export function SettingsScreen() {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: spacing.xxxl }}>
+    <ScrollView style={styles.root} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: tabBarHeight + spacing.xxxl }}>
       <Text style={styles.title}>Settings</Text>
       <PremiumSection />
       <OrganizationSection />
       <SyncSection />
+      <AboutSection />
       {__DEV__ && <DeveloperSection />}
     </ScrollView>
   );

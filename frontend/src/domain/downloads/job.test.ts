@@ -18,10 +18,22 @@ describe("buildJob", () => {
     const i = v({ type: "image", container: "png", has_video: false, has_audio: false });
     expect(buildJob({ taskId: "t", title: null, platform: "Other", selection: { mode: "single", variant: i } })).toMatchObject({ kind: "image", filename: "download.png", relativePath: "Other/Images" });
   });
-  it("refuses video-only as a single file, non-mp4 mux, and streaming protocols", () => {
+  it("refuses video-only as a single file, and streaming protocols", () => {
     expect(() => buildJob({ taskId: "t", title: "x", platform: "P", selection: { mode: "single", variant: v({ has_audio: false }) } })).toThrow(UnsupportedSelectionError);
-    expect(() => buildJob({ taskId: "t", title: "x", platform: "P", selection: { mode: "mux", video: v({ container: "webm", has_audio: false }), audio: v({ type: "audio", container: "m4a" }) } })).toThrow(UnsupportedSelectionError);
     expect(() => buildJob({ taskId: "t", title: "x", platform: "P", selection: { mode: "single", variant: v({ protocol: "dash" }) } })).toThrow(UnsupportedSelectionError);
+  });
+
+  it("H.264/AAC mux uses the fast on-device path (MP4, no re-encode)", () => {
+    const j = buildJob({ taskId: "t", title: "x", platform: "P", selection: { mode: "mux", video: v({ has_audio: false, video_codec: "avc1" }), audio: v({ type: "audio", container: "m4a", audio_codec: "mp4a.40.2" }) } });
+    expect(j).toMatchObject({ postProcess: "mux", filename: "x.mp4", mime: "video/mp4" });
+  });
+
+  // 2026-09-23, Instagram Reels: VP9 video-only (even labeled with an mp4 container, or any other
+  // codec combo) is still downloadable — just via the FFmpeg fallback (Matroska, stream-copy, no
+  // re-encode), not the fast MediaMuxer path which only accepts H.264/AAC.
+  it("non-H.264 mux (e.g. VP9) falls back to FFmpeg (MKV, still no re-encode)", () => {
+    const j = buildJob({ taskId: "t", title: "x", platform: "P", selection: { mode: "mux", video: v({ container: "webm", has_audio: false, video_codec: "vp9" }), audio: v({ type: "audio", container: "m4a" }) } });
+    expect(j).toMatchObject({ postProcess: "mux-ffmpeg", filename: "x.mkv", mime: "video/x-matroska" });
   });
 });
 

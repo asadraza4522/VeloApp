@@ -19,6 +19,12 @@ const toPart = (v: MediaVariant, role: NativePart["role"]): NativePart => ({ url
 
 const isMp4Video = (v: MediaVariant) => v.container === "mp4" || v.container === "m4v";
 const isAac = (v: MediaVariant) => v.container === "m4a" || v.container === "mp4" || (v.audio_codec ?? "").startsWith("mp4a");
+// The container label alone doesn't mean MediaMuxer can mux it (a platform can label a container
+// "mp4" while the video track is actually VP9/AV1 — seen on Instagram Reels); the fast on-device
+// MediaMuxer path only accepts H.264/AAC. Everything else falls back to "mux-ffmpeg" (see
+// FfmpegRunner.kt), which stream-copies any codec combination into Matroska — that path doesn't
+// care about codec at all, so it needs no matching isMuxableVideo-style gate.
+const isAvcVideo = (v: MediaVariant) => (v.video_codec ?? "").startsWith("avc");
 
 function assertDownloadable(...vs: MediaVariant[]) {
   for (const v of vs) {
@@ -58,8 +64,12 @@ export function buildJob(input: JobInput): NativeDownloadJob {
 
   if (sel.mode === "mux") {
     assertDownloadable(sel.video, sel.audio);
-    if (!isMp4Video(sel.video) || !isAac(sel.audio)) throw new UnsupportedSelectionError("These streams can't be merged on-device (need MP4 video + AAC audio)");
-    return finish("video", "mp4", sel.video.height ? `${sel.video.height}p` : null, "mux");
+    const resolution = sel.video.height ? `${sel.video.height}p` : null;
+    // Fast path: no re-encode, MediaMuxer straight to MP4 (H.264/AAC only).
+    if (isMp4Video(sel.video) && isAvcVideo(sel.video) && isAac(sel.audio)) return finish("video", "mp4", resolution, "mux");
+    // Fallback: any other codec combination (VP9/AV1 video, non-AAC audio) — FFmpeg stream-copies
+    // into Matroska, still no re-encode, just a container that doesn't care what's inside it.
+    return finish("video", "mkv", resolution, "mux-ffmpeg");
   }
 
   const v = sel.variant;

@@ -23,6 +23,29 @@ jobs:
       - run: npx jest --ci
       - run: npx expo-doctor
 
+  native-android:
+    # Kotlin unit tests for the native download engine (velo-download-engine). android/ is
+    # generated (CNG, gitignored) so prebuild runs first; no emulator needed, JVM tests only.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: npm ci
+      - run: npx expo prebuild --platform android --no-install
+      - uses: gradle/actions/setup-gradle@v4
+      - run: (cd android && ./gradlew :velo-download-engine:testDebugUnitTest :velo-download-engine:compileDebugKotlin -PreactNativeArchitectures=arm64-v8a --console=plain)
+
   worker:
     runs-on: ubuntu-latest
     defaults:

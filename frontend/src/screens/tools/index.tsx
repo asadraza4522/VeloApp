@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow, useTheme } from "@/design/theme";
+import { useTabBarHeight } from "@/hooks/use-tab-bar-height";
 
 type Tool = { route: "/tool/extract-audio" | "/tool/trim" | "/tool/image" | "/tool/frame" | "/tool/reorganize" | "/tool/duplicates" | "/tool/storage"; icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"]; title: string; desc: string };
 
@@ -38,8 +39,9 @@ function Card({ t }: { t: Tool }) {
 export function ToolsScreen() {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
   return (
-    <ScrollView style={styles.root} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: spacing.xxxl }}>
+    <ScrollView style={styles.root} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: tabBarHeight + spacing.xxxl }}>
       <Text style={styles.heading}>Tools</Text>
       <Text style={styles.section}>Media</Text>
       {MEDIA.map((t) => <Card key={t.route} t={t} />)}

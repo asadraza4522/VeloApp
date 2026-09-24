@@ -177,7 +177,7 @@ class Downloader(
  * coroutine has finished, and a blocked socket read never lets it finish. A child coroutine that suspends on
  * awaitCancellation() gets its `finally` run as soon as cancellation is requested.
  */
-suspend fun <T> Downloader.runCancellable(block: () -> T): T = coroutineScope {
+suspend fun <T> Downloader.runCancellable(block: suspend () -> T): T = coroutineScope {
   val watcher = launch { try { awaitCancellation() } finally { cancel() } }
   try {
     withContext(Dispatchers.IO) { block() }

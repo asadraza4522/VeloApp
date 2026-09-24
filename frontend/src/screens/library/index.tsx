@@ -11,6 +11,7 @@ import { useQueue, useSources } from "@/db/hooks";
 import type { QueueRow } from "@/db/queries/downloads";
 import type { Source } from "@/db/queries/sources";
 import { fonts, fontSize, makeStyles, radius, spacing, tactileShadow, useTheme } from "@/design/theme";
+import { useTabBarHeight } from "@/hooks/use-tab-bar-height";
 import { useUiStore } from "@/stores/ui-store";
 
 const PAGE = 100;
@@ -51,13 +52,14 @@ export function LibraryScreen() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
   const segment = useUiStore((s) => s.librarySegment);
   const setSegment = useUiStore((s) => s.setLibrarySegment);
   const search = useUiStore((s) => s.librarySearch);
   const setSearch = useUiStore((s) => s.setLibrarySearch);
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View style={[styles.root, { paddingTop: insets.top, paddingBottom: tabBarHeight }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Library</Text>
         <TextInput
